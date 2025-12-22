@@ -52,6 +52,7 @@
                             fill="currentColor" />
                     </svg>
                 </a>
+                <div id="nav-indicator" class="nav-indicator"></div>
             </nav>
 
             <div class="settings">
@@ -74,7 +75,6 @@
             <div id="view-home" class="view active">
                 <div class="empty-state-container">
                     <div class="illustration">
-                        <!-- Use a CSS placeholder or SVG for the illustration -->
                         <div class="graph-placeholder">
                             <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -252,35 +252,71 @@
             <!-- View: Checklist / Reservations -->
             <div id="view-checklist" class="view hidden">
                 <div class="checklist-container">
+                    <!-- Filter Bar (Collapsible) -->
+                    <div id="filter-panel" class="filter-bar hidden">
+                        <div class="filter-row">
+                            <!-- Status Filter -->
+                            <div class="filter-group">
+                                <div class="select-wrapper">
+                                    <select id="filter-status">
+                                        <option value="" disabled selected style="display:none">Estado</option>
+                                        <option value="">Todos</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="Pagado">Pagado</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down select-icon"></i>
+                                </div>
+                            </div>
+
+                            <!-- Name Filter -->
+                            <div class="filter-group">
+                                <input type="text" id="filter-name" placeholder="Nombre">
+                            </div>
+
+                            <!-- Client ID Filter with Search Icon -->
+                            <div class="filter-group">
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                    <input type="text" id="filter-client-id" placeholder="N° de cliente">
+                                </div>
+                            </div>
+
+                            <!-- Date Range Filters -->
+                            <div class="filter-group date-range-group">
+                                <div class="date-range-container">
+                                    <div class="date-input-wrapper">
+                                        <input type="text" id="filter-date-from" placeholder="Fecha desde">
+                                        <i class="fa-solid fa-calendar-alt calendar-icon"></i>
+                                    </div>
+                                    <span class="range-arrow">→</span>
+                                    <div class="date-input-wrapper">
+                                        <input type="text" id="filter-date-to" placeholder="Fecha hasta">
+                                        <i class="fa-solid fa-calendar-alt calendar-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Search Button -->
+                            <div class="filter-actions">
+                                <button id="btn-search-apply" class="btn-search">Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="checklist-header">
-                        <div class="col-nro">Nro <i class="fa-solid fa-caret-up"></i></div>
+                        <div class="col-nro" data-sort="nro">Nro <i class="fa-solid fa-sort"></i></div>
                         <div class="col-estado">Estado</div>
-                        <div class="col-cliente">Cliente <i class="fa-solid fa-caret-up"></i></div>
-                        <div class="col-fecha-reserva">Fecha de Reserva <i class="fa-solid fa-caret-up"></i></div>
+                        <div class="col-cliente" data-sort="cliente">Cliente <i class="fa-solid fa-sort"></i></div>
+                        <div class="col-fecha-reserva" data-sort="fechaReserva">Fecha de Reserva <i
+                                class="fa-solid fa-sort"></i></div>
                         <div class="col-uso">Uso</div>
-                        <div class="col-fecha-evento">Fecha del Evento <i class="fa-solid fa-caret-up"></i></div>
+                        <div class="col-fecha-evento" data-sort="fechaEvento">Fecha del Evento <i
+                                class="fa-solid fa-sort"></i></div>
                         <div class="col-servicios">Servicios</div>
                         <div class="col-actions">Cancelar Deuda</div>
                     </div>
 
                     <div id="reservations-list" class="reservations-list">
-                        <!-- Example row (will be empty usually or populated via JS) -->
-                        <!-- 
-                        <div class="reservation-card">
-                            <div class="col-nro">1</div>
-                            <div class="col-estado"><span class="status status-pending">Pendiente</span></div>
-                            <div class="col-cliente">Ramiro Octavio</div>
-                            <div class="col-fecha-reserva">23-03-2023</div>
-                            <div class="col-uso">Baby Shower</div>
-                            <div class="col-fecha-evento">04-04-2023</div>
-                            <div class="col-servicios">No</div>
-                            <div class="col-actions">
-                                <button class="btn-cancel">Cancelar</button>
-                                <button class="btn-view">Ver</button>
-                                <button class="btn-more"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                            </div>
-                        </div>
-                        -->
                     </div>
 
                     <div class="pagination">
@@ -297,7 +333,7 @@
             </div>
         </main>
     </div>
-    <script src="script.js"></script>
+    <script src="../01_javascript/script.js"></script>
 </body>
 
 </html>
