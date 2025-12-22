@@ -9,6 +9,7 @@
     --accent: #f3da66;
     /* Gold/Yellow */
     --accent-hover: #F4C430;
+    --accent-hover-cancel: #bf3636;
     --border-color: #444444;
     --font-main: 'Inter', sans-serif;
 }
@@ -62,6 +63,8 @@ body {
     flex-direction: column;
     gap: 30px;
     flex: 1;
+    position: relative;
+    /* Added for indicator positioning */
 }
 
 .nav-item {
@@ -87,17 +90,18 @@ body {
     color: var(--accent);
 }
 
-.nav-item.active::after {
-    content: '';
+.nav-indicator {
     position: absolute;
     right: -28px;
-    /* Adjust based on sidebar width padding */
+    /* Matching your previous right position */
     width: 4px;
     height: 40px;
     background-color: #d97706;
-    /* More orange than user yellow? matching image sidebar line */
+    /* Your orange color */
     border-radius: 2px 0 0 2px;
     pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Smooth sliding animation */
 }
 
 .nav-item:not(.active):hover {
@@ -542,7 +546,7 @@ input:checked+.slider:before {
     }
 }
 
-/* Checklist View Styles */
+/*------------------------------------------------------------------------------- Checklist View Styles--------------------------------------------------------------------- */
 .checklist-container {
     display: flex;
     flex-direction: column;
@@ -561,10 +565,180 @@ input:checked+.slider:before {
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.btn-filter:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-filter.active {
+    background-color: #ffffff;
+    color: #121212;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .btn-filter.hidden {
     display: none;
+}
+
+/* Filter Bar Styles */
+.filter-bar {
+    background: rgba(45, 45, 45, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    animation: slideDown 0.3s ease-out;
+}
+
+.filter-bar.hidden {
+    display: none;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 140px;
+}
+
+.filter-group input,
+.filter-group select {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    color: #eee;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: var(--accent);
+    background-color: #333;
+    box-shadow: 0 0 0 2px rgba(228, 198, 90, 0.1);
+}
+
+/* Custom Select Arrow */
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    width: 100%;
+    appearance: none;
+    padding-right: 35px;
+}
+
+.select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+    font-size: 0.8rem;
+}
+
+/* Input with Icon */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.input-with-icon input {
+    padding-left: 38px;
+    width: 100%;
+}
+
+/* Date Range specific */
+.date-range-group {
+    flex: 2;
+    min-width: 320px;
+}
+
+.date-range-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.date-input-wrapper input {
+    width: 100%;
+    padding-right: 35px;
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+    font-size: 0.85rem;
+}
+
+.range-arrow {
+    color: #555;
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.btn-search {
+    background-color: var(--accent);
+    color: #121212;
+    border: none;
+    padding: 11px 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-search:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-search:active {
+    transform: translateY(0);
 }
 
 .checklist-header {
@@ -575,6 +749,11 @@ input:checked+.slider:before {
     text-transform: capitalize;
     margin-bottom: 10px;
     align-items: center;
+}
+
+.checklist-header [data-sort] {
+    cursor: pointer;
+    user-select: none;
 }
 
 .checklist-header i {
@@ -594,7 +773,7 @@ input:checked+.slider:before {
     background-color: #222222;
     /* Slightly lighter than #121212 */
     border-radius: 10px;
-    padding: 12px 20px;
+    padding: 12px 12px 12px 20px;
     display: flex;
     align-items: center;
     transition: background 0.2s, transform 0.1s;
@@ -608,43 +787,54 @@ input:checked+.slider:before {
 
 /* Column Widths */
 .col-nro {
-    width: 4%;
+    white-space: nowrap;
+    width: 2%;
+    text-align: center;
 }
 
 .col-estado {
     width: 12%;
+    text-align: center;
 }
 
 .col-cliente {
-    width: 18%;
+    width: 10%;
+    text-align: center;
 }
 
 .col-fecha-reserva {
     width: 15%;
+    text-align: center;
 }
 
 .col-uso {
     width: 10%;
+    text-align: center;
 }
 
 .col-fecha-evento {
     width: 15%;
+    text-align: center;
 }
 
 .col-servicios {
-    width: 8%;
+    width: 10%;
+    text-align: center;
 }
 
 .col-actions {
-    width: 18%;
+    flex: 1;
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
+    /* Mueve la columna sutilmente a la derecha */
 }
 
 .checklist-header .col-actions {
-    justify-content: flex-start;
+    justify-content: flex-end;
+    padding-right: 135px;
+    /* Alinea el texto justo encima del botón 'Cancelar' */
 }
 
 /* Status Badges */
@@ -663,6 +853,7 @@ input:checked+.slider:before {
 
 /* Row Buttons */
 .btn-cancel {
+    height: 30px;
     background-color: #ef4444;
     color: white;
     border: none;
@@ -671,17 +862,24 @@ input:checked+.slider:before {
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s;
+    margin-right: 25px;
+    /* <--- Esto empuja el botón hacia la izquierda, alejándolo de 'Ver' */
 }
 
 .btn-view {
     background-color: var(--accent);
     color: #121212;
     border: none;
-    padding: 6px 14px;
+    padding: 6px 24px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s;
+    /* margin-left: auto; removido para agrupar botones a la derecha */
 }
 
 .btn-more {
@@ -689,7 +887,26 @@ input:checked+.slider:before {
     color: #888;
     border: none;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 0px 0px 0px 0px;
+    transition: color 0.3s;
+    display: flex;
+}
+
+.btn-more svg {
+    width: 30px;
+    height: 30px;
+}
+
+.btn-more:hover {
+    color: var(--accent);
+}
+
+.btn-view:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-cancel:hover {
+    background-color: var(--accent-hover-cancel);
 }
 
 /* Pagination */
@@ -707,13 +924,14 @@ input:checked+.slider:before {
 .page-num.current {
     background-color: var(--accent);
     color: #121212;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     font-weight: 700;
+    padding-right: 2px;
 }
 
 .pager-btn {
@@ -721,15 +939,22 @@ input:checked+.slider:before {
     border: none;
     color: var(--accent);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 
 .page-select {
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 5px;
-    border-bottom: 1px solid #555;
-    padding-bottom: 2px;
+    border-bottom: 1px solid #f3da66;
+    padding-bottom: 4px;
     cursor: pointer;
-    margin-left: 10px;
+    width: 45px;
+    justify-content: center;
+}
+
+.page-select i {
+    color: var(--accent);
+    font-size: 0.6rem;
 }
