@@ -7,8 +7,38 @@ document.addEventListener('DOMContentLoaded', () => {
         disableMobile: true
     };
 
-    if (document.getElementById('booking-date')) flatpickr("#booking-date", flatpickrConfig);
-    if (document.getElementById('event-date')) flatpickr("#event-date", flatpickrConfig);
+    if (document.getElementById('booking-date')) {
+        const el = document.getElementById('booking-date');
+        flatpickr(el, flatpickrConfig);
+        applyDateMask(el);
+    }
+    if (document.getElementById('event-date')) {
+        const el = document.getElementById('event-date');
+        flatpickr(el, flatpickrConfig);
+        applyDateMask(el);
+    }
+
+    function applyDateMask(input) {
+        input.addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, ''); // Numeros solamente
+            if (v.length > 8) v = v.slice(0, 8); // Maximo 8 digitos
+
+            if (v.length >= 5) {
+                v = v.replace(/^(\d{2})(\d{2})(\d{0,4}).*/, '$1/$2/$3');
+            } else if (v.length >= 3) {
+                v = v.replace(/^(\d{2})(\d{0,2}).*/, '$1/$2');
+            }
+            e.target.value = v;
+        });
+
+        // Opcional: Evitar que se escriban letras directamente
+        input.addEventListener('keydown', (e) => {
+            const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'];
+            if (!allowedKeys.includes(e.key) && !/^\d$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    }
 
     // Navigation
     const btnAddReservation = document.getElementById('btn-add-reservation');
@@ -35,6 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnFilter.classList.remove('hidden');
             } else {
                 btnFilter.classList.add('hidden');
+                // Reset y Hide Filter Panel al salir
+                const filterWrapper = document.getElementById('filter-reveal-wrapper');
+                if (filterWrapper) {
+                    filterWrapper.classList.remove('active');
+                    btnFilter.classList.remove('active');
+                    // Limpiar valores de los inputs
+                    document.getElementById('filter-status').value = "";
+                    document.getElementById('filter-name').value = "";
+                    document.getElementById('filter-client-id').value = "";
+                    document.getElementById('filter-date-from').value = "";
+                    document.getElementById('filter-date-to').value = "";
+                    // Restablecer la lista completa
+                    activeReservations = [...dummyReservations];
+                    renderReservations();
+                }
             }
         }
 
@@ -76,29 +121,59 @@ document.addEventListener('DOMContentLoaded', () => {
         switchView('view-checklist');
     });
 
-    // Dummy Data for Checklist
-    const dummyReservations = [
-        { nro: 1, estado: 'Pendiente', cliente: 'Ramiro Octavio', fechaReserva: '10/05/2023', uso: 'Baby Shower', fechaEvento: '15/06/2023', servicios: 'No' },
-        { nro: 2, estado: 'Pendiente', cliente: 'Amanda Griselda', fechaReserva: '11/05/2023', uso: 'Cumpleaños', fechaEvento: '20/07/2023', servicios: 'Si' },
-        { nro: 3, estado: 'Pendiente', cliente: 'Ricardo Sosa', fechaReserva: '12/05/2023', uso: 'Cumpleaños', fechaEvento: '25/08/2022', servicios: 'Si' },
-        { nro: 4, estado: 'Pagado', cliente: 'Lucia Fernandez', fechaReserva: '13/05/2023', uso: 'Boda', fechaEvento: '14/04/2022', servicios: 'No' },
-        { nro: 5, estado: 'Pendiente', cliente: 'Marcos Ruiz', fechaReserva: '14/05/2023', uso: 'Cumpleaños', fechaEvento: '26/04/2022', servicios: 'Si' },
-        { nro: 6, estado: 'Pendiente', cliente: 'Elena Gomez', fechaReserva: '15/05/2023', uso: 'Reunión', fechaEvento: '21/04/2022', servicios: 'Si' },
-        { nro: 7, estado: 'Pagado', cliente: 'Aquiles Garcia', fechaReserva: '16/05/2023', uso: 'baile/joda', fechaEvento: '21/11/2022', servicios: 'Si' }
+    // Dummy Data for Checklist (Generando más datos para probar paginación)
+    const baseReservations = [
+        { estado: 'Pendiente', cliente: 'Ramiro Octavio', uso: 'Baby Shower', servicios: 'No' },
+        { estado: 'Pendiente', cliente: 'Amanda Griselda', uso: 'Cumpleaños', servicios: 'Si' },
+        { estado: 'Pendiente', cliente: 'Ricardo Sosa', uso: 'Cumpleaños', servicios: 'Si' },
+        { estado: 'Pagado', cliente: 'Lucia Fernandez', uso: 'Boda', servicios: 'No' },
+        { estado: 'Pendiente', cliente: 'Marcos Ruiz', uso: 'Cumpleaños', servicios: 'Si' },
+        { estado: 'Pendiente', cliente: 'Elena Gomez', uso: 'Reunión', servicios: 'Si' },
+        { estado: 'Pagado', cliente: 'Aquiles Garcia', uso: 'baile/joda', servicios: 'Si' }
     ];
+
+    let dummyReservations = [];
+    // Generar 65 reservaciones para tener al menos 4 páginas (20 por página)
+    for (let i = 1; i <= 65; i++) {
+        const base = baseReservations[i % baseReservations.length];
+        dummyReservations.push({
+            nro: i,
+            estado: base.estado,
+            cliente: `${base.cliente} ${i}`,
+            fechaReserva: `10/${(i % 12) + 1}/2023`,
+            uso: base.uso,
+            fechaEvento: `15/${(i % 12) + 1}/2023`,
+            servicios: base.servicios
+        });
+    }
 
     let activeReservations = [...dummyReservations];
     let currentSort = { field: null, direction: 'asc' };
 
-    function renderReservations(data = activeReservations) {
+    // Configuración de Paginación
+    let currentPage = 1;
+    const itemsPerPage = 20;
+
+    function renderReservations(data = activeReservations, page = 1) {
         const list = document.getElementById('reservations-list');
         if (!list) return;
         list.innerHTML = '';
-        data.forEach(res => {
+
+        // Lógica de Paginación: Recortar datos
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedData = data.slice(startIndex, endIndex);
+
+        paginatedData.forEach((res, index) => {
             const statusClass = res.estado === 'Pagado' ? 'status-paid' : 'status-pending';
-            const row = document.createElement('div');
-            row.className = 'reservation-card';
-            row.innerHTML = `
+            const item = document.createElement('div');
+            item.className = 'reservation-item';
+            item.style.animationDelay = `${index * 0.03}s`;
+
+            // 1. Tarjeta Principal
+            const card = document.createElement('div');
+            card.className = 'reservation-card';
+            card.innerHTML = `
                 <div class="col-nro">${res.nro}</div>
                 <div class="col-estado"><span class="status ${statusClass}">${res.estado}</span></div>
                 <div class="col-cliente">${res.cliente}</div>
@@ -106,9 +181,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="col-uso">${res.uso}</div>
                 <div class="col-fecha-evento">${res.fechaEvento}</div>
                 <div class="col-servicios">${res.servicios}</div>
-                <div class="col-actions">
+                <div class="col-btn-cancel">
                     ${res.estado === 'Pendiente' ? '<button class="btn-cancel">Cancelar</button>' : ''}
-                    <button class="btn-view">Ver</button>
+                </div>
+                <div class="col-btn-view">
+                    <button class="btn-view action-view-details">Ver</button>
+                </div>
+                <div class="col-btn-more">
                     <button class="btn-more">
                         <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
                             <path d="M116,64a12,12,0,1,1,12,12A12.01375,12.01375,0,0,1,116,64Zm12,52a12,12,0,1,0,12,12A12.01375,12.01375,0,0,0,128,116Zm0,64a12,12,0,1,0,12,12A12.01375,12.01375,0,0,0,128,180Z" 
@@ -119,8 +198,178 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             `;
-            list.appendChild(row);
+
+            // 2. Panel de Detalles (Oculto por defecto)
+            const details = document.createElement('div');
+            details.className = 'details-panel';
+            details.innerHTML = `
+                <div class="details-content">
+                    <div class="details-grid">
+                        <!-- Columna 1: Datos Cliente -->
+                        <div class="detail-column">
+                            <h4>Nro de Cliente: ${res.nro}</h4>
+                            <p><strong>Nombre:</strong> ${res.cliente}</p>
+                            <p><strong>Telefono:</strong> 3644556040</p>
+                            <p><strong>DNI:</strong> 41111098</p>
+                        </div>
+                        
+                        <!-- Columna 2: Descripción -->
+                        <div class="detail-column">
+                            <h4>Descripcion</h4>
+                            <p>Texto prueba texto prueba texto prueba texto prueba texto prueba texto prueba texto prueba</p>
+                        </div>
+
+                        <!-- Columna 3: Fechas -->
+                        <div class="detail-column">
+                            <h4>Desde</h4>
+                            <p>${res.fechaEvento}</p>
+                            <h4>Hasta</h4>
+                            <p>${res.fechaEvento}</p>
+                        </div>
+
+                        <!-- Columna 4: Servicio (Centrado) -->
+                        <div class="detail-column center-content">
+                            <h4>Servicio</h4>
+                            <p style="margin-top: 10px; line-height: 1.6;">
+                                ${res.uso === 'Baby Shower' ? 'Aire<br>Acondicionado<br>3hs' : 'Salón<br>completo<br>Full'}
+                            </p>
+                        </div>
+
+                        <!-- Columna 5: Montos -->
+                        <div class="detail-column">
+                            <h4>Conceptos <span style="float:right;">Monto</span></h4>
+                            <div class="amount-row">
+                                <span>Alquiler:</span>
+                                <span>$ 80.000,00</span>
+                            </div>
+                            <div class="amount-row">
+                                <span>Servicios:</span>
+                                <span>$ 6.500,00</span>
+                            </div>
+                            <div class="amount-row text-green">
+                                <span>Total Pagado:</span>
+                                <span>$ 20.000,00</span>
+                            </div>
+                            <div class="amount-row text-red">
+                                <span>Deuda:</span>
+                                <span>$ 66.500,00</span>
+                            </div>
+                            <div class="divider-line"></div>
+                            <div class="amount-row">
+                                <strong>Total:</strong>
+                                <strong>$ 86.500,00</strong>
+                            </div>
+                            <button class="btn-ver-pagos">Ver Pagos</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 3. Lógica de Toggle
+            const btnView = card.querySelector('.action-view-details');
+            btnView.addEventListener('click', () => {
+                const isExpanded = card.classList.contains('expanded');
+
+                // Cerrar todos los demás primero (Opcional, si quieres comportamiento de acordeón único)
+                document.querySelectorAll('.reservation-card.expanded').forEach(c => {
+                    if (c !== card) {
+                        c.classList.remove('expanded');
+                        c.nextElementSibling.classList.remove('open');
+                    }
+                });
+
+                // Toggle actual
+                card.classList.toggle('expanded');
+                details.classList.toggle('open');
+            });
+
+            item.appendChild(card);
+            item.appendChild(details);
+            list.appendChild(item);
         });
+
+        renderPagination(data.length, page);
+    }
+
+    function renderPagination(totalItems, currentPage) {
+        const paginationContainer = document.querySelector('.pagination');
+        if (!paginationContainer) return;
+
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        if (totalPages <= 1) return;
+
+        // Texto "Página"
+        const label = document.createElement('span');
+        label.textContent = 'Página';
+        paginationContainer.appendChild(label);
+
+        // Flecha Izquierda
+        const btnPrev = document.createElement('span');
+        btnPrev.className = 'pagination-arrow';
+        btnPrev.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+        btnPrev.onclick = () => {
+            if (currentPage > 1) renderReservations(activeReservations, currentPage - 1);
+        };
+        paginationContainer.appendChild(btnPrev);
+
+        // Número Actual (Círculo)
+        const currentIndicator = document.createElement('div');
+        currentIndicator.className = 'page-current';
+        currentIndicator.textContent = currentPage;
+        paginationContainer.appendChild(currentIndicator);
+
+        // Flecha Derecha
+        const btnNext = document.createElement('span');
+        btnNext.className = 'pagination-arrow';
+        btnNext.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+        btnNext.onclick = () => {
+            if (currentPage < totalPages) renderReservations(activeReservations, currentPage + 1);
+        };
+        paginationContainer.appendChild(btnNext);
+
+        // Dropdown personalizado a la derecha (Despliegue hacia arriba)
+        const dropdownWrapper = document.createElement('div');
+        dropdownWrapper.className = 'custom-pagination-dropdown';
+
+        const dropdownTrigger = document.createElement('div');
+        dropdownTrigger.className = 'pagination-trigger';
+        dropdownTrigger.innerHTML = `${currentPage} <i class="fa-solid fa-chevron-up"></i>`;
+
+        const dropdownMenu = document.createElement('ul');
+        dropdownMenu.className = 'pagination-menu';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.textContent = i;
+            if (i === currentPage) li.className = 'active';
+            li.onclick = (e) => {
+                e.stopPropagation();
+                renderReservations(activeReservations, i);
+            };
+            dropdownMenu.appendChild(li);
+        }
+
+        dropdownTrigger.onclick = (e) => {
+            e.stopPropagation();
+            // Cerrar otros dropdowns si los hubiera
+            document.querySelectorAll('.pagination-menu.show').forEach(m => {
+                if (m !== dropdownMenu) m.classList.remove('show');
+            });
+            dropdownMenu.classList.toggle('show');
+            dropdownTrigger.classList.toggle('open');
+        };
+
+        // Cerrar al hacer click fuera
+        document.addEventListener('click', () => {
+            dropdownMenu.classList.remove('show');
+            dropdownTrigger.classList.remove('open');
+        });
+
+        dropdownWrapper.appendChild(dropdownTrigger);
+        dropdownWrapper.appendChild(dropdownMenu);
+        paginationContainer.appendChild(dropdownWrapper);
     }
 
     function sortReservations(field) {
@@ -136,10 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let valB = b[field];
 
             if (field.toLowerCase().includes('fecha')) {
-                const partsA = valA.split('/').map(Number);
-                const partsB = valB.split('/').map(Number);
-                valA = new Date(partsA[2], partsA[1] - 1, partsA[0]);
-                valB = new Date(partsB[2], partsB[1] - 1, partsB[0]);
+                valA = parseDate(valA);
+                valB = parseDate(valB);
             }
 
             if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
@@ -147,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return 0;
         });
 
-        renderReservations(activeReservations);
+        renderReservations(activeReservations, currentPage);
     }
 
     // Header sort events
@@ -158,17 +405,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Filter Panel logic
-    const filterPanel = document.getElementById('filter-panel');
-    if (btnFilter && filterPanel) {
+    const filterWrapper = document.getElementById('filter-reveal-wrapper');
+    if (btnFilter && filterWrapper) {
         btnFilter.addEventListener('click', () => {
-            filterPanel.classList.toggle('hidden');
+            filterWrapper.classList.toggle('active');
             btnFilter.classList.toggle('active');
         });
     }
 
     // Filter Date Pickers
-    if (document.getElementById('filter-date-from')) flatpickr("#filter-date-from", { dateFormat: "d/m/Y", locale: "es", disableMobile: true });
-    if (document.getElementById('filter-date-to')) flatpickr("#filter-date-to", { dateFormat: "d/m/Y", locale: "es", disableMobile: true });
+    if (document.getElementById('filter-date-from')) {
+        const el = document.getElementById('filter-date-from');
+        flatpickr(el, flatpickrConfig);
+        applyDateMask(el);
+    }
+    if (document.getElementById('filter-date-to')) {
+        const el = document.getElementById('filter-date-to');
+        flatpickr(el, flatpickrConfig);
+        applyDateMask(el);
+    }
 
     function parseDate(dateStr) {
         if (!dateStr) return null;
@@ -206,7 +461,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return matchesStatus && matchesName && matchesId && matchesDate;
             });
 
-            renderReservations(activeReservations);
+            currentPage = 1; // Resetear a página 1 al filtrar
+            renderReservations(activeReservations, currentPage);
         });
     }
 
