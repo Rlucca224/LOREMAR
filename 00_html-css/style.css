@@ -12,6 +12,9 @@
     --accent-hover-cancel: #bf3636;
     --border-color: #444444;
     --font-main: 'Inter', sans-serif;
+    /* Oranges */
+    --orange-1: #d4934c;
+    --orange-2: #d97706;
 }
 
 * {
@@ -118,7 +121,8 @@ body {
 .main-content {
     flex: 1;
     padding: 30px;
-    overflow-y: auto;
+    overflow-y: hidden;
+    /* FIX: Bloqueamos scroll global para permitir scrolls internos */
     display: flex;
     flex-direction: column;
 }
@@ -128,6 +132,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: default;
 }
 
 .top-bar h1 {
@@ -148,10 +153,37 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    /* Por defecto hidden para layouts complejos */
+    min-height: 0;
+    /* Importante para Flexbox anidados */
+}
+
+/* Excepción: El formulario y Home sí necesitan scrollear la vista entera */
+#view-new-reservation,
+#view-home {
+    overflow-y: auto;
 }
 
 .view.hidden {
     display: none;
+    ;
+}
+
+.view.active {
+    animation: fadeInView 0.5s ease-out forwards;
+}
+
+@keyframes fadeInView {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Home View */
@@ -162,6 +194,7 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--text-secondary);
+    cursor: default;
 }
 
 .illustration {
@@ -210,10 +243,12 @@ body {
 .form-card h2 {
     margin-bottom: 25px;
     font-size: 1.6rem;
+    cursor: default;
 }
 
 .form-section {
     margin-bottom: 60px;
+    cursor: default;
 }
 
 .section-title {
@@ -557,9 +592,12 @@ input:checked+.slider:before {
 
 /*-------------------------------------------------------------------- Checklist View Styles---------------------------------------------------------------- */
 .checklist-container {
+    flex: 1;
+    padding-right: 10px;
+    overflow-y: scroll;
+    /* Siempre muestra el carril de scroll para alinear con el header */
     display: flex;
     flex-direction: column;
-    flex: 1;
 }
 
 .btn-filter {
@@ -769,13 +807,29 @@ input:checked+.slider:before {
 }
 
 .checklist-header {
-    display: flex;
-    padding: 10px 20px;
+    overflow-y: scroll;
+    /* Fuerza el espacio de la barra de scroll siempre */
+    display: none;
+    /* Oculto por defecto - JS lo activará */
     color: #888;
+    padding-right: 30px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     font-size: 0.8rem;
     text-transform: capitalize;
     margin-bottom: 10px;
     align-items: center;
+}
+
+/* Ocultar visualmente la barra del header pero mantener el espacio */
+.checklist-header::-webkit-scrollbar {
+    background: transparent;
+}
+
+.checklist-header::-webkit-scrollbar-thumb {
+    background: transparent;
+    border: none;
 }
 
 .checklist-header [data-sort] {
@@ -854,7 +908,11 @@ input:checked+.slider:before {
     color: #121212 !important;
 }
 
-.reservation-card:hover {
+.reservation-card.expanded .btn-view {
+    background-color: #ffffff !important;
+}
+
+.reservation-card:not(.expanded):hover {
     background-color: #2a2a2a;
     border-color: #444;
 }
@@ -967,60 +1025,8 @@ input:checked+.slider:before {
 /* Column Widths */
 .col-nro {
     white-space: nowrap;
-    width: 2%;
+    width: 3%;
     text-align: center;
-}
-
-.col-estado {
-    width: 12%;
-    text-align: center;
-}
-
-.col-cliente {
-    width: 10%;
-    text-align: center;
-}
-
-.col-fecha-reserva {
-    width: 15%;
-    text-align: center;
-}
-
-.col-uso {
-    width: 10%;
-    text-align: center;
-}
-
-.col-fecha-evento {
-    width: 15%;
-    text-align: center;
-}
-
-.col-servicios {
-    width: 10%;
-    text-align: center;
-}
-
-.col-btn-cancel {
-    width: 120px;
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.col-btn-view {
-    width: 90px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.col-btn-more {
-    width: 40px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
 }
 
 /* Status Badges */
@@ -1036,6 +1042,60 @@ input:checked+.slider:before {
 .status-paid {
     color: #10b981;
 }
+
+.col-estado {
+    width: 12%;
+    text-align: center;
+}
+
+.col-cliente {
+    width: 15%;
+    text-align: center;
+}
+
+.col-fecha-reserva {
+    width: 15%;
+    text-align: center;
+}
+
+.col-uso {
+    display: flex-start;
+    width: 15%;
+    text-align: center;
+}
+
+.col-fecha-evento {
+    width: 15%;
+    text-align: center;
+}
+
+.col-servicios {
+    width: 10%;
+    text-align: center;
+}
+
+.col-btn-cancel {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.col-btn-view {
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.col-btn-more {
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 
 /* Row Buttons */
 .btn-cancel {
@@ -1096,7 +1156,8 @@ input:checked+.slider:before {
 .pagination {
     margin-top: auto;
     padding-top: 30px;
-    display: flex;
+    display: none;
+    /* Oculto por defecto - JS lo activará */
     justify-content: center;
     align-items: center;
     gap: 15px;
@@ -1117,18 +1178,6 @@ input:checked+.slider:before {
     padding-right: 2px;
 }
 
-/* Pagination y Dropdown */
-.pagination {
-    margin-top: auto;
-    padding-top: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
-    color: #aeaeae;
-    /* Texto gris claro "Pagina" */
-}
 
 .pagination-arrow {
     color: var(--accent);
@@ -1248,4 +1297,178 @@ input:checked+.slider:before {
     border-width: 6px;
     border-style: solid;
     border-color: #222 transparent transparent transparent;
+}
+
+/* -------------------------------------------------------------------------- Scrollbar Personalizada -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* El "track" es el fondo. Ponerlo transparente elimina el blanco */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* El "thumb" es la parte que arrastras */
+::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #666;
+}
+
+/* -------------------------------------------------------------------------- Menú Contextual (More Options) -------------------------------------------------------------------------- */
+.more-menu {
+    position: absolute;
+    background-color: #222;
+    border: 2px solid #444;
+    border-radius: 8px 0px 8px 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    width: 6%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.more-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.more-menu-option {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    cursor: pointer;
+    color: #e5e5e5;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.more-menu-option:hover {
+    background-color: #333;
+    color: var(--accent);
+}
+
+.more-menu-option:active {
+    background-color: #2a2a2a;
+}
+
+.more-menu-option i {
+    font-size: 0.85rem;
+    width: 16px;
+}
+
+/* Separador entre opciones */
+.more-menu-divider {
+    height: 2px;
+    background-color: #444;
+    margin: 0px 0;
+}
+
+/* -------------------------------------------------------------------------- Modal de Confirmación -------------------------------------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-box {
+    background-color: #222;
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 40px 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    max-width: 450px;
+    text-align: center;
+}
+
+.modal-overlay.show .modal-box {
+    transform: scale(1);
+}
+
+.modal-message {
+    color: #e5e5e5;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.modal-btn-cancel {
+    background-color: #555;
+    color: #e5e5e5;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #666;
+}
+
+.modal-btn-confirm {
+    background-color: var(--accent);
+    color: #121212;
+}
+
+.modal-btn-confirm:hover {
+    background-color: var(--accent-hover);
+}
+
+.modal-btn:active {
+    transform: scale(0.98);
+}
+
+/* Aplicar blur al contenido cuando el modal está activo */
+.app-container.modal-active {
+    filter: blur(4px);
+    pointer-events: none;
 }

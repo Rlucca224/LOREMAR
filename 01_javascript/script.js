@@ -61,26 +61,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (btnFilter) {
+            const filterWrapper = document.getElementById('filter-reveal-wrapper');
             if (viewId === 'view-checklist') {
                 btnFilter.classList.remove('hidden');
+                // Aseguramos que el wrapper exista pero esté cerrado inicialmente o mantenga estado si se desea
+                if (filterWrapper) {
+                    // Solo quitamos 'display: none' si queremos que el botón funcione, 
+                    // pero la clase .active es la que lo muestra expandido.
+                    // Para evitar parpadeos, lo dejamos manejado por el botón, 
+                    // pero si cambiamos de vista y volvemos, quizás quieras resetearlo.
+                    // Por ahora, solo aseguramos que el botón esté disponible.
+                }
             } else {
                 btnFilter.classList.add('hidden');
-                // Reset y Hide Filter Panel al salir
-                const filterWrapper = document.getElementById('filter-reveal-wrapper');
+                // Reset y Hide Filter Panel al salir de la vista
                 if (filterWrapper) {
                     filterWrapper.classList.remove('active');
+                    filterWrapper.style.display = 'none'; // Forzar ocultado visual
                     btnFilter.classList.remove('active');
+
                     // Limpiar valores de los inputs
                     document.getElementById('filter-status').value = "";
                     document.getElementById('filter-name').value = "";
                     document.getElementById('filter-client-id').value = "";
                     document.getElementById('filter-date-from').value = "";
                     document.getElementById('filter-date-to').value = "";
+
                     // Restablecer la lista completa
                     activeReservations = [...dummyReservations];
                     renderReservations();
                 }
             }
+        }
+
+        // Control manual de visibilidad para elementos "flotantes" (Header y Paginación)
+        // Solución solicitada para no modificar estructura HTML
+        const checklistHeader = document.querySelector('.checklist-header');
+        const pagination = document.querySelector('.pagination');
+
+        if (viewId === 'view-checklist') {
+            if (checklistHeader) checklistHeader.style.display = 'flex';
+            if (pagination) pagination.style.display = 'flex';
+        } else {
+            if (checklistHeader) checklistHeader.style.display = 'none';
+            if (pagination) pagination.style.display = 'none';
         }
 
         let targetNavId = '';
@@ -153,6 +177,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuración de Paginación
     let currentPage = 1;
     const itemsPerPage = 20;
+
+    // Event Listeners para el Modal de Confirmación de Eliminación
+    const deleteModal = document.getElementById('delete-modal');
+    const btnCancelDelete = deleteModal?.querySelector('.modal-btn-cancel');
+    const btnConfirmDelete = deleteModal?.querySelector('.modal-btn-confirm');
+
+    // Botón "Volver" - Cerrar modal sin eliminar
+    btnCancelDelete?.addEventListener('click', () => {
+        deleteModal.classList.remove('show');
+        setTimeout(() => {
+            deleteModal.classList.add('hidden');
+        }, 300);
+    });
+
+    // Botón "Aceptar" - Confirmar eliminación
+    btnConfirmDelete?.addEventListener('click', () => {
+        const reservationId = parseInt(deleteModal.dataset.reservationToDelete);
+
+        if (reservationId) {
+            // Eliminar del array principal
+            const index = dummyReservations.findIndex(r => r.nro === reservationId);
+            if (index !== -1) {
+                dummyReservations.splice(index, 1);
+
+                // Actualizar la lista filtrada
+                filterReservations();
+
+                console.log(`Reserva #${reservationId} eliminada.`);
+            }
+        }
+
+        // Cerrar modal
+        deleteModal.classList.remove('show');
+        setTimeout(() => {
+            deleteModal.classList.add('hidden');
+        }, 300);
+    });
 
     function renderReservations(data = activeReservations, page = 1) {
         const list = document.getElementById('reservations-list');
@@ -283,6 +344,97 @@ document.addEventListener('DOMContentLoaded', () => {
                 details.classList.toggle('open');
             });
 
+            // 4. Lógica del Menú Contextual (More Options)
+            const btnMore = card.querySelector('.btn-more');
+            btnMore.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evitar que se cierre inmediatamente
+
+                // Cerrar cualquier otro menú abierto
+                document.querySelectorAll('.more-menu').forEach(menu => {
+                    if (menu.dataset.reservationId !== res.nro.toString()) {
+                        menu.remove();
+                    }
+                });
+
+                // Verificar si ya existe un menú para esta reserva
+                let existingMenu = document.querySelector(`.more-menu[data-reservation-id="${res.nro}"]`);
+                if (existingMenu) {
+                    existingMenu.remove();
+                    return;
+                }
+
+                // Crear el menú
+                const menu = document.createElement('div');
+                menu.className = 'more-menu';
+                menu.dataset.reservationId = res.nro;
+                menu.innerHTML = `
+                    <div class="more-menu-option" data-action="edit">
+                        <i class="fa-solid fa-pen"></i>
+                        <span>Editar</span>
+                    </div>
+                    <div class="more-menu-divider"></div>
+                    <div class="more-menu-option" data-action="delete">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Eliminar</span>
+                    </div>
+                `;
+
+                // Posicionar el menú
+                document.body.appendChild(menu);
+                const btnRect = btnMore.getBoundingClientRect();
+                menu.style.position = 'fixed';
+                menu.style.top = `${btnRect.bottom + 5}px`;
+                menu.style.left = `${btnRect.left - menu.offsetWidth + btnRect.width - 20}px`;
+
+                // Mostrar con animación
+                setTimeout(() => menu.classList.add('show'), 10);
+
+                // Manejar clics en las opciones
+                menu.querySelectorAll('.more-menu-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const action = option.dataset.action;
+
+                        if (action === 'edit') {
+                            console.log('Editar reserva:', res.nro);
+                            // TODO: Implementar lógica de edición
+                            // switchView('view-new-reservation');
+                            // Cargar datos de la reserva en el formulario
+                        } else if (action === 'delete') {
+                            // Cerrar el menú contextual
+                            menu.remove();
+
+                            // Mostrar el modal de confirmación
+                            const modal = document.getElementById('delete-modal');
+                            const appContainer = document.querySelector('.app-container');
+
+                            // Guardar el ID de la reserva a eliminar
+                            modal.dataset.reservationToDelete = res.nro;
+
+                            // Mostrar modal con animación
+                            modal.classList.remove('hidden');
+                            setTimeout(() => modal.classList.add('show'), 10);
+
+                            // No ejecutar el menu.remove() del final porque ya lo hicimos
+                            return;
+                        }
+
+                        menu.remove();
+                    });
+                });
+
+                // Cerrar menú al hacer clic fuera
+                setTimeout(() => {
+                    const closeMenu = (e) => {
+                        if (!menu.contains(e.target) && e.target !== btnMore) {
+                            menu.remove();
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    };
+                    document.addEventListener('click', closeMenu);
+                }, 10);
+            });
+
             item.appendChild(card);
             item.appendChild(details);
             list.appendChild(item);
@@ -408,8 +560,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterWrapper = document.getElementById('filter-reveal-wrapper');
     if (btnFilter && filterWrapper) {
         btnFilter.addEventListener('click', () => {
-            filterWrapper.classList.toggle('active');
-            btnFilter.classList.toggle('active');
+            const isActive = filterWrapper.classList.contains('active');
+
+            if (!isActive) {
+                // Abrir
+                filterWrapper.style.display = 'block';
+                // Pequeño timeout para permitir que el display:block se renderice antes de la animacion
+                setTimeout(() => {
+                    filterWrapper.classList.add('active');
+                    btnFilter.classList.add('active');
+                }, 10);
+            } else {
+                // Cerrar
+                filterWrapper.classList.remove('active');
+                btnFilter.classList.remove('active');
+                // Esperar a que termine la transicion CSS (0.4s) antes de ocultar
+                setTimeout(() => {
+                    if (!filterWrapper.classList.contains('active')) {
+                        filterWrapper.style.display = 'none';
+                    }
+                }, 400);
+            }
         });
     }
 
@@ -423,6 +594,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('filter-date-to');
         flatpickr(el, flatpickrConfig);
         applyDateMask(el);
+    }
+
+    function filterReservations() {
+        // TODO: Implementar lógica de filtros real aquí cuando se programen los inputs de filtro
+        // Por ahora, simplemente refrescamos activeReservations con los datos actuales
+        activeReservations = [...dummyReservations];
+        // Si la página actual queda vacía, retroceder una página
+        if (activeReservations.length > 0 && Math.ceil(activeReservations.length / itemsPerPage) < currentPage) {
+            currentPage--;
+        }
+        if (currentPage < 1) currentPage = 1;
+
+        renderReservations(activeReservations, currentPage);
     }
 
     function parseDate(dateStr) {
