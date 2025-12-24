@@ -72,6 +72,59 @@
                 </button>
             </header>
 
+            <!-- Filter Bar (Moved Here defined globally but visible conditionally) -->
+            <div id="filter-reveal-wrapper" class="filter-reveal-container" style="display: none;">
+                <div id="filter-panel" class="filter-bar">
+                    <div class="filter-row">
+                        <!-- Status Filter -->
+                        <div class="filter-group">
+                            <div class="select-wrapper">
+                                <select id="filter-status">
+                                    <option value="" disabled selected style="display:none">Estado</option>
+                                    <option value="">Todos</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Pagado">Pagado</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Name Filter -->
+                        <div class="filter-group">
+                            <input type="text" id="filter-name" placeholder="Nombre">
+                        </div>
+
+                        <!-- Client ID Filter with Search Icon -->
+                        <div class="filter-group">
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                <input type="text" id="filter-client-id" placeholder="N° de cliente">
+                            </div>
+                        </div>
+
+                        <!-- Date Range Filters -->
+                        <div class="filter-group date-range-group">
+                            <div class="date-range-container">
+                                <div class="date-input-wrapper">
+                                    <input type="text" id="filter-date-from" placeholder="Fecha desde">
+                                    <i class="fa-solid fa-calendar-alt calendar-icon"></i>
+                                </div>
+                                <span class="range-arrow">→</span>
+                                <div class="date-input-wrapper">
+                                    <input type="text" id="filter-date-to" placeholder="Fecha hasta">
+                                    <i class="fa-solid fa-calendar-alt calendar-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="filter-actions">
+                            <button id="btn-search-apply" class="btn-search">Buscar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- View: Home / Empty State -->
             <div id="view-home" class="view active">
                 <div class="empty-state-container">
@@ -235,7 +288,7 @@
                                 <div class="input-group">
                                     <label>Saldo Pendiente</label>
                                     <div class="input-wrapper locked">
-                                        <input type="text" id="price-balance" value="Auto Calculado" readonly>
+                                        <input type="text" id="price-balance" value="Total" readonly>
                                         <i class="fa-solid fa-dollar-sign input-icon-right"></i>
                                     </div>
                                 </div>
@@ -250,93 +303,52 @@
                     </form>
                 </div>
             </div>
+
+            <!-- View: Checklist / Reservations -->
+            <div class="checklist-header">
+                <div class="col-nro" data-sort="nro">Nro <i class="fa-solid fa-sort"></i></div>
+                <div class="col-estado">Estado</div>
+                <div class="col-cliente" data-sort="cliente">Cliente <i class="fa-solid fa-sort"></i></div>
+                <div class="col-fecha-reserva" data-sort="fechaReserva">Fecha de Reserva <i
+                        class="fa-solid fa-sort"></i></div>
+                <div class="col-uso">Uso</div>
+                <div class="col-fecha-evento" data-sort="fechaEvento">Fecha del Evento <i class="fa-solid fa-sort"></i>
+                </div>
+                <div class="col-servicios">Servicios</div>
+                <div class="col-btn-cancel">Cancelar Deuda</div>
+                <div class="col-btn-view"></div>
+                <div class="col-btn-more"></div>
+            </div>
+
             <!-- View: Checklist / Reservations -->
             <div id="view-checklist" class="view hidden">
                 <div class="checklist-container">
-                    <!-- Filter Bar (Collapsible) -->
-                    <div id="filter-reveal-wrapper" class="filter-reveal-container">
-                        <div id="filter-panel" class="filter-bar">
-                            <div class="filter-row">
-                                <!-- Status Filter -->
-                                <div class="filter-group">
-                                    <div class="select-wrapper">
-                                        <select id="filter-status">
-                                            <option value="" disabled selected style="display:none">Estado</option>
-                                            <option value="">Todos</option>
-                                            <option value="Pendiente">Pendiente</option>
-                                            <option value="Pagado">Pagado</option>
-                                        </select>
-                                        <i class="fa-solid fa-chevron-down select-icon"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Name Filter -->
-                                <div class="filter-group">
-                                    <input type="text" id="filter-name" placeholder="Nombre">
-                                </div>
-
-                                <!-- Client ID Filter with Search Icon -->
-                                <div class="filter-group">
-                                    <div class="input-with-icon">
-                                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                                        <input type="text" id="filter-client-id" placeholder="N° de cliente">
-                                    </div>
-                                </div>
-
-                                <!-- Date Range Filters -->
-                                <div class="filter-group date-range-group">
-                                    <div class="date-range-container">
-                                        <div class="date-input-wrapper">
-                                            <input type="text" id="filter-date-from" placeholder="Fecha desde">
-                                            <i class="fa-solid fa-calendar-alt calendar-icon"></i>
-                                        </div>
-                                        <span class="range-arrow">→</span>
-                                        <div class="date-input-wrapper">
-                                            <input type="text" id="filter-date-to" placeholder="Fecha hasta">
-                                            <i class="fa-solid fa-calendar-alt calendar-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Search Button -->
-                                <div class="filter-actions">
-                                    <button id="btn-search-apply" class="btn-search">Buscar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="checklist-header">
-                        <div class="col-nro" data-sort="nro">Nro <i class="fa-solid fa-sort"></i></div>
-                        <div class="col-estado">Estado</div>
-                        <div class="col-cliente" data-sort="cliente">Cliente <i class="fa-solid fa-sort"></i></div>
-                        <div class="col-fecha-reserva" data-sort="fechaReserva">Fecha de Reserva <i
-                                class="fa-solid fa-sort"></i></div>
-                        <div class="col-uso">Uso</div>
-                        <div class="col-fecha-evento" data-sort="fechaEvento">Fecha del Evento <i
-                                class="fa-solid fa-sort"></i></div>
-                        <div class="col-servicios">Servicios</div>
-                        <div class="col-btn-cancel">Cancelar Deuda</div>
-                        <div class="col-btn-view"></div>
-                        <div class="col-btn-more"></div>
-                    </div>
-
                     <div id="reservations-list" class="reservations-list">
-                    </div>
-
-                    <div class="pagination">
-                        <span>Página</span>
-                        <button class="pager-btn"><i class="fa-solid fa-caret-left"></i></button>
-                        <span class="page-num current">1</span>
-                        <button class="pager-btn"><i class="fa-solid fa-caret-right"></i></button>
-                        <div class="page-select">
-                            <span>1</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
                     </div>
                 </div>
             </div>
+            <div class="pagination">
+                <span>Página</span>
+                <button class="pager-btn"><i class="fa-solid fa-caret-left"></i></button>
+                <span class="page-num current">1</span>
+                <button class="pager-btn"><i class="fa-solid fa-caret-right"></i></button>
+                <div class="page-select">
+                    <span>1</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
         </main>
+
+        <!-- Modal de Confirmación de Eliminación -->
+        <div id="delete-modal" class="modal-overlay hidden">
+            <div class="modal-box">
+                <p class="modal-message">¿Está seguro que desea eliminar?</p>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-cancel">Volver</button>
+                    <button class="modal-btn modal-btn-confirm">Aceptar</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="../01_javascript/script.js"></script>
 </body>
