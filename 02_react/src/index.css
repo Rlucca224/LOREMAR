@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-dark: #121212;
     --sidebar-bg: #4a4a4a;
     /* Gray sidebar as seen in image */
@@ -93,19 +93,15 @@ body {
 }
 
 /* Active indicator (orange line) */
-
 .nav-indicator {
     position: absolute;
     right: -28px;
-    /* Matching your previous right position */
     width: 3px;
     height: 40px;
     background-color: #d97706;
-    /* Your orange color */
     border-radius: 3px 0 0 3px;
     pointer-events: none;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* Smooth sliding animation */
 }
 
 .nav-item:not(.active):hover {
@@ -649,7 +645,7 @@ input:checked+.slider:before {
     margin-bottom: 0;
     backdrop-filter: blur(10px);
     min-height: 0;
-    width: 65%;
+    width: 70%;
     overflow: hidden;
     opacity: 0;
     transition: opacity 0.3s ease, padding 0.3s ease, margin-bottom 0.3s ease;
@@ -1478,7 +1474,7 @@ input:checked+.slider:before {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 25px 60px;
+    padding: 40px 60px;
     max-width: 400px;
     /* Estado inicial para transición suave */
     transform: scale(0.8);
@@ -1518,4 +1514,365 @@ input:checked+.slider:before {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+
+.btn-search {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: none !important;
+}
+
+.btn-search::after,
+.btn-search::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* 3. Corregir icono lupa - usando search-wrapper */
+.search-wrapper {
+    position: relative;
+}
+
+.search-wrapper .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af !important;
+    font-size: 0.9rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.search-wrapper input {
+    padding-left: 45px !important;
+}
+
+
+
+/* Fix adicional para eliminar CUALQUIER flecha del botón buscar */
+.btn-search,
+.btn-search * {
+    background-image: none !important;
+    list-style: none !important;
+}
+
+.btn-search::after,
+.btn-search::before {
+    content: '' !important;
+    display: none !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* Asegurar que no herede estilos de select */
+.filter-actions .btn-search {
+    all: unset;
+    background-color: var(--accent) !important;
+    color: #121212 !important;
+    border: none !important;
+    padding: 10px 30px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+    font-family: var(--font-main) !important;
+}
+
+.filter-actions .btn-search:hover {
+    background-color: var(--accent-hover) !important;
+}
+
+
+/* Corrección crítica de posicionamiento para grupos de filtros */
+.filter-group {
+    position: relative !important;
+    /* Esto asegura que los iconos absolutos (como el chevron del select) 
+       se queden DENTRO de su grupo y no vuelen al botón buscar */
+}
+
+
+/* Eliminar flecha nativa blanca del selector de estado */
+.filter-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+}
+
+/* Fix para IE/Edge (por seguridad) */
+.filter-select::-ms-expand {
+    display: none;
+}
+
+/* --- REFACTORIZACIÓN: ESTILOS MOVIDOS DE INLINE A CSS --- */
+
+/* Layout.jsx */
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    width: 100%;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content-area {
+    flex: 1;
+    overflow-y: auto;
+    /* Por defecto con scroll */
+    display: flex;
+    flex-direction: column;
+}
+
+.content-area.no-scroll {
+    overflow-y: hidden !important;
+    /* Home sin scroll */
+}
+
+/* Sidebar.jsx */
+.profile-icon-container {
+    margin-bottom: 40px;
+}
+
+.profile-img {
+    width: 51px;
+    height: 51px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #333;
+}
+
+.nav-menu {
+    position: relative;
+}
+
+.nav-indicator-sliding {
+    position: absolute;
+    right: -28px;
+    width: 3px;
+    height: 40px;
+    background-color: var(--orange-2);
+    border-radius: 4px 0 0 4px;
+    pointer-events: none;
+    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    /* top, height, opacity controlados por JS inline */
+}
+
+/* ReservationCard.jsx */
+.col-btn-more {
+    position: relative;
+}
+
+.more-menu {
+    /* Base styles */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 100;
+    display: none;
+    /* Oculto por defecto */
+}
+
+.more-menu.show {
+    display: flex;
+    /* O block, dependiendo del diseño original */
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+
+/* --- ESTILOS DEL FORMULARIO DE NUEVA RESERVA --- */
+.form-card {
+    background-color: var(--sidebar-bg);
+    /* O #222 si la variable no existe */
+    border-radius: 16px;
+    padding: 30px;
+    flex: 1;
+}
+
+.form-card h2 {
+    margin-bottom: 25px;
+    font-size: 1.6rem;
+    color: white;
+}
+
+.form-section {
+    margin-bottom: 60px;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.grid-row {
+    display: grid;
+    gap: 20px;
+}
+
+.three-cols {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.four-cols {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+}
+
+.input-wrapper {
+    position: relative;
+    background-color: #3b3b3b;
+    border: 1px solid #555;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    height: 48px;
+    transition: border-color 0.3s ease;
+}
+
+.input-wrapper input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 0 15px;
+    color: white;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.input-wrapper:focus-within {
+    border-color: #f3da66;
+    /* accent */
+}
+
+/* Switch Toggle */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #555;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: '';
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #f3da66;
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+/* Stepper */
+.service-controls {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.service-controls.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    background-color: #3b3b3b;
+    border: 1px solid #555;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.stepper-btn {
+    background: #444;
+    border: none;
+    color: white;
+    width: 38px;
+    height: 48px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.stepper-input {
+    width: 70px;
+    height: 48px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    color: white;
+}
+
+.services-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.service-toggle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.form-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
 }
