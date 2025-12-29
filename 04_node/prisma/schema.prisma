@@ -1,0 +1,38 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Reservation {
+  id        Int      @id @default(autoincrement()) // nroCliente/Reserva
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 1. Datos del Cliente
+  clientName  String
+  clientDni   String?
+  clientPhone String?
+
+  // 2. Detalles del Evento
+  eventType   String?  // Ej: Cumpleaños, Casamiento
+  eventDate   DateTime
+  description String?  // Detalles adicionales
+
+  // 3. Servicios Adicionales (Aire Acondicionado)
+  hasAc          Boolean @default(false)
+  acHours        Int     @default(0)
+  acPricePerHour Float   @default(0) // Tarifa por hora
+  acTotal        Float   @default(0) // acHours * acPricePerHour
+
+  // 4. Montos y Pagos
+  rentalPrice  Float   @default(0) // Precio base del alquiler
+  deposit      Float   @default(0) // Seña recibida
+  balance      Float   @default(0) // Saldo pendiente (Calculado: Alquiler + AC - Seña)
+  
+  status       String  @default("Pendiente") // Pendiente | Pagado | Cancelado
+}

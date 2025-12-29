@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Flatpickr from 'react-flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
+import SuccessModal from './SuccessModal';
 
 // Nota: Los estilos de Flatpickr ya están cargados en index.html o index.css
 
@@ -25,6 +26,30 @@ const NewReservation = () => {
     const [priceDeposit, setPriceDeposit] = useState('');
     const [balanceDisplay, setBalanceDisplay] = useState('Total');
 
+    // Estado para el modal de feedback (éxito o error)
+    const [modalConfig, setModalConfig] = useState({
+        isOpen: false,
+        type: 'success',
+        title: '',
+        message: ''
+    });
+
+    // Prevenir scrollbar durante la animación de entrada
+    useLayoutEffect(() => {
+        const viewContainer = document.getElementById('view-new-reservation');
+        if (viewContainer) {
+            // Bloquear overflow INMEDIATAMENTE antes del primer paint
+            viewContainer.style.overflowY = 'hidden';
+
+            // Restaurar después de la animación (450ms para margen de seguridad)
+            const timer = setTimeout(() => {
+                viewContainer.style.overflowY = 'auto';
+            }, 450);
+
+            return () => clearTimeout(timer);
+        }
+    }, []); // Solo al montar
+
     // 2. Efecto para Cálculo Automático de Saldo
     useEffect(() => {
         const rent = parseFloat(priceRent) || 0;
@@ -45,7 +70,9 @@ const NewReservation = () => {
         } else if (pending <= 0 && total > 0) {
             setBalanceDisplay("Pagado");
         } else {
-            setBalanceDisplay(`$ ${pending}`);
+            // Formato: 1.234,56
+            const formatted = pending.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            setBalanceDisplay(`$ ${formatted}`);
         }
 
     }, [priceRent, priceDeposit, hasAC, acHours, acRate]);
@@ -55,10 +82,78 @@ const NewReservation = () => {
         setAcHours(prev => Math.max(1, prev + delta));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Guardando reserva...", { clientName, eventDate, balanceDisplay });
-        navigate('/reservas');
+
+        // Preparar objeto para enviar
+        const payload = {
+            clientName,
+            clientDni,
+            clientPhone,
+            eventType,
+            eventDate, // String "dd/mm/yyyy" ?? Cuidado, el backend espera Date object o ISO string
+            description: eventDesc,
+            hasAc: hasAC,
+            acHours,
+            acPricePerHour: parseFloat(acRate) || 0,
+            rentalPrice: parseFloat(priceRent) || 0,
+            deposit: parseFloat(priceDeposit) || 0,
+            eventTime: "Día Completo" // Valor por defecto temporal si no tenemos input
+        };
+
+        // Corrección de fecha para el backend (espera YYYY-MM-DD o ISO)
+        // Si el datepicker devuelve "dd/mm/yyyy", hay que invertirlo
+        if (eventDate && eventDate.includes('/')) {
+            const [day, month, year] = eventDate.split('/');
+            payload.eventDate = `${year}-${month}-${day}`;
+        }
+
+        try {
+            console.log("Enviando reserva:", payload);
+            const response = await fetch('http://192.168.1.3:4000/api/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const saved = await response.json();
+                console.log("Reserva guardada:", saved);
+
+                // ÉXITO: Mostrar modal verde y navegar
+                setModalConfig({
+                    isOpen: true,
+                    type: 'success',
+                    title: '¡Reserva confirmada!',
+                    message: 'La reserva ha sido registrada con éxito.'
+                });
+
+                setTimeout(() => {
+                    navigate('/reservas');
+                }, 3000);
+
+            } else {
+                // ERROR DE BACKEND (ej. validación fallida)
+                console.error("Error del servidor:", response.statusText);
+                setModalConfig({
+                    isOpen: true,
+                    type: 'error',
+                    title: '¡Error al guardar!',
+                    message: 'Hubo un problema con los datos. Por favor revisa e intenta de nuevo.'
+                });
+            }
+        } catch (error) {
+            // ERROR DE RED
+            console.error("Error de red:", error);
+            setModalConfig({
+                isOpen: true,
+                type: 'error',
+                title: '¡Error de conexión!',
+                message: 'No se pudo conectar con el servidor. Verifica tu internet.'
+            });
+        }
     };
 
     return (
@@ -297,6 +392,13 @@ const NewReservation = () => {
 
                 </form>
             </div>
+            <SuccessModal
+                isOpen={modalConfig.isOpen}
+                type={modalConfig.type}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+            />
         </div>
     );
 };

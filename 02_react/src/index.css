@@ -1,18 +1,29 @@
-﻿:root {
+﻿/* ==========================================================================
+   LOREMAR EVENTOS - MAIN STYLESHEET
+   ========================================================================== */
+
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
+:root {
     --bg-dark: #121212;
     --sidebar-bg: #4a4a4a;
-    /* Gray sidebar as seen in image */
+    /* Sidebar Gray */
     --card-bg: #333333;
     --input-bg: #2b2b2b;
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
+
+    /* Accents */
     --accent: #f3da66;
-    /* Gold/Yellow */
+    /* Gold/Yellow Main */
     --accent-hover: #F4C430;
     --accent-hover-cancel: #bf3636;
+
     --border-color: #444444;
     --font-main: 'Inter', sans-serif;
-    /* Oranges */
+
+    /* Secondary Colors */
     --orange-1: #d4934c;
     --orange-2: #d97706;
 }
@@ -31,12 +42,15 @@ body {
     overflow: hidden;
 }
 
+/* =========================================
+   2. LAYOUT STRUCTURE
+   ========================================= */
 .app-container {
     display: flex;
     height: 100%;
 }
 
-/* Sidebar */
+/* --- Sidebar --- */
 .sidebar {
     width: 80px;
     background-color: var(--sidebar-bg);
@@ -45,9 +59,8 @@ body {
     align-items: center;
     padding: 14px 0;
     border-radius: 15px;
-    /* Rounded right side */
     margin: 10px 0 10px 10px;
-    /* Floating sidebar look */
+    /* Floating effect */
     height: calc(100% - 20px);
 }
 
@@ -67,7 +80,6 @@ body {
     gap: 30px;
     flex: 1;
     position: relative;
-    /* Added for indicator positioning */
 }
 
 .nav-item {
@@ -92,7 +104,7 @@ body {
     color: #d97706;
 }
 
-/* Active indicator (orange line) */
+/* Active indicator (Static version) */
 .nav-indicator {
     position: absolute;
     right: -28px;
@@ -113,12 +125,10 @@ body {
     margin-bottom: 15px;
 }
 
-/* Main Content */
+/* --- Main Content Area --- */
 .main-content {
     flex: 1;
-    padding: 30px;
-    overflow-y: hidden;
-    /* FIX: Bloqueamos scroll global para permitir scrolls internos */
+    padding: 30px 30px 20px 30px;
     display: flex;
     flex-direction: column;
 }
@@ -129,6 +139,7 @@ body {
     justify-content: space-between;
     align-items: center;
     cursor: default;
+    user-select: none;
 }
 
 .top-bar h1 {
@@ -144,36 +155,30 @@ body {
     color: transparent;
 }
 
-/* Views */
+/* =========================================
+   3. VIEW MANAGEMENT & ANIMATIONS
+   ========================================= */
 .view {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    /* Por defecto hidden para layouts complejos */
     min-height: 0;
-    /* Importante para Flexbox anidados */
-}
-
-/* Excepción: El formulario y Home sí necesitan scrollear la vista entera */
-#view-new-reservation,
-#view-home {
-    overflow-y: auto;
 }
 
 .view.hidden {
     display: none;
-    ;
 }
 
-.view.active {
-    animation: fadeInView 0.5s ease-out forwards;
+/* Entry Animation */
+.view.active .form-card,
+.view.active .empty-state-container {
+    animation: fadeInUp 0.4s ease-out forwards;
 }
 
-@keyframes fadeInView {
+@keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
 
     to {
@@ -182,7 +187,9 @@ body {
     }
 }
 
-/* Home View */
+/* =========================================
+   4. HOME VIEW (Empty State)
+   ========================================= */
 .empty-state-container {
     flex: 1;
     display: flex;
@@ -227,10 +234,11 @@ body {
     background-color: var(--accent-hover);
 }
 
-/* Reservation Form Card */
+/* =========================================
+   5. RESERVATION FORM
+   ========================================= */
 .form-card {
     background-color: var(--sidebar-bg);
-    /* Use the lighter grey from sidebar for card bg */
     border-radius: 16px;
     padding: 30px;
     flex: 1;
@@ -254,7 +262,7 @@ body {
     color: var(--text-primary);
 }
 
-/* Grid Layouts */
+/* Grid Systems */
 .grid-row {
     display: grid;
     gap: 20px;
@@ -268,7 +276,7 @@ body {
     grid-template-columns: repeat(4, 1fr);
 }
 
-/* Input Styles */
+/* Input Components */
 .input-group {
     display: flex;
     flex-direction: column;
@@ -288,9 +296,7 @@ body {
     display: flex;
     align-items: center;
     height: 48px;
-    /* Fixed height for the container */
     transition: border-color 0.3s ease;
-
 }
 
 .input-wrapper:focus-within {
@@ -300,23 +306,24 @@ body {
 .input-wrapper input {
     width: 100%;
     height: 100%;
-    /* Fill the fixed container height */
     background: transparent;
     border: none;
     padding: 0 15px;
-    /* Horizontal padding only */
     color: var(--text-primary);
     font-size: 0.95rem;
     outline: none;
     line-height: normal;
-    /* Avoid browser defaults stretching the box */
 }
 
 .input-wrapper input::placeholder {
     color: #777;
 }
 
-/* Hide spin buttons for number inputs */
+input:focus {
+    outline: none;
+}
+
+/* Number Input cleanups */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -329,7 +336,7 @@ input[type=number] {
     appearance: textfield;
 }
 
-/* Flatpickr Custom Styling */
+/* Flatpickr Overrides */
 .flatpickr-calendar {
     background: var(--card-bg) !important;
     border: 1px solid var(--border-color) !important;
@@ -355,14 +362,8 @@ input[type=number] {
     fill: var(--accent) !important;
 }
 
-.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
-    background: #323646 !important;
-}
-
-.flatpickr-current-month input.cur-year:hover {
-    background: #323646 !important;
-}
-
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover,
+.flatpickr-current-month input.cur-year:hover,
 .flatpickr-current-month .numInputWrapper:hover {
     background: #323646 !important;
 }
@@ -372,18 +373,16 @@ input[type=number] {
     border-bottom-color: var(--card-bg) !important;
 }
 
-/* Icon positioning */
+/* Icons in inputs */
 .input-icon {
     position: absolute;
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: #ff8d28;
-    /* Orange/Gold icon color */
     font-size: 1rem;
 }
 
-/* Input with icon padding */
 .input-wrapper:has(.input-icon) input {
     padding-left: 50px;
 }
@@ -395,7 +394,7 @@ input[type=number] {
     pointer-events: none;
 }
 
-/* Services */
+/* Services & Toggles */
 .services-row {
     display: flex;
     align-items: center;
@@ -409,7 +408,6 @@ input[type=number] {
     gap: 15px;
 }
 
-/* Toggle Switch */
 .switch {
     position: relative;
     display: inline-block;
@@ -461,13 +459,12 @@ input:checked+.slider:before {
     border-radius: 50%;
 }
 
-/* Stepper */
+/* Stepper Control */
 .service-controls {
     display: flex;
     gap: 20px;
     align-items: flex-end;
     opacity: 0.5;
-    /* Disabled state default */
     pointer-events: none;
     transition: opacity 0.3s;
 }
@@ -515,7 +512,6 @@ input:checked+.slider:before {
     outline: none;
 }
 
-/* Mini group for inline */
 .mini-group {
     width: auto;
 }
@@ -525,7 +521,6 @@ input:checked+.slider:before {
     border-color: #444;
 }
 
-/* Submit Button */
 .form-footer {
     display: flex;
     justify-content: center;
@@ -550,7 +545,7 @@ input:checked+.slider:before {
     background-color: var(--accent-hover);
 }
 
-/* Responsive */
+/* Responsive Grid/Sidebar */
 @media (max-width: 900px) {
 
     .three-cols,
@@ -586,14 +581,40 @@ input:checked+.slider:before {
     }
 }
 
-/*-------------------------------------------------------------------- Checklist View Styles---------------------------------------------------------------- */
+/* =========================================
+   6. CHECKLIST & FILTER VIEW
+   ========================================= */
+.reservation-list-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .checklist-container {
     flex: 1;
     padding-right: 10px;
     overflow-y: scroll;
-    /* Siempre muestra el carril de scroll para alinear con el header */
     display: flex;
     flex-direction: column;
+}
+
+/* Scrollbar Styles Restored */
+.checklist-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.checklist-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.checklist-container::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 4px;
+}
+
+.checklist-container::-webkit-scrollbar-thumb:hover {
+    background-color: #929292;
 }
 
 .btn-filter {
@@ -625,48 +646,34 @@ input:checked+.slider:before {
     display: none;
 }
 
-/* Filter Bar Container (Smooth Reveal) */
+/* Filter Bar Reveal Animation */
 .filter-reveal-container {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-bottom 0.3s ease;
+    display: block;
+    max-height: 0;
+    opacity: 0;
     overflow: hidden;
+    margin-bottom: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s ease;
 }
 
 .filter-reveal-container.active {
-    grid-template-rows: 1fr;
+    max-height: 100px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-bottom: 20px;
 }
 
 .filter-bar {
     background: rgba(45, 45, 45, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    padding: 0 15px;
+    padding: 15px 15px;
     margin-bottom: 0;
     backdrop-filter: blur(10px);
     min-height: 0;
-    width: 70%;
+    width: 65%;
     overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease, padding 0.3s ease, margin-bottom 0.3s ease;
-}
-
-.filter-reveal-container.active .filter-bar {
-    padding: 15px;
-    margin-bottom: 20px;
-    opacity: 1;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .filter-row {
@@ -698,12 +705,16 @@ input:checked+.slider:before {
     transition: all 0.3s;
 }
 
+#filter-status option[disabled] {
+    display: none;
+}
+
 .filter-group input:focus,
 .filter-group select:focus {
     border-color: var(--accent);
 }
 
-/* Custom Select Arrow */
+/* Select Arrow Customization */
 .select-wrapper {
     position: relative;
 }
@@ -724,7 +735,7 @@ input:checked+.slider:before {
     font-size: 0.8rem;
 }
 
-/* Input with Icon */
+/* Search Components */
 .input-with-icon {
     position: relative;
 }
@@ -743,7 +754,6 @@ input:checked+.slider:before {
     width: 100%;
 }
 
-/* Date Range specific */
 .date-range-group {
     flex: none;
     width: 350px;
@@ -802,11 +812,10 @@ input:checked+.slider:before {
     transform: translateY(0);
 }
 
+/* Checklist Header */
 .checklist-header {
     overflow-y: scroll;
-    /* Fuerza el espacio de la barra de scroll siempre */
-    display: none;
-    /* Oculto por defecto - JS lo activará */
+    display: flex;
     color: #888;
     padding-right: 30px;
     padding-left: 20px;
@@ -815,9 +824,9 @@ input:checked+.slider:before {
     font-size: 0.8rem;
     margin-bottom: 10px;
     align-items: center;
+    user-select: none;
 }
 
-/* Ocultar visualmente la barra del header pero mantener el espacio */
 .checklist-header::-webkit-scrollbar {
     background: transparent;
 }
@@ -842,13 +851,14 @@ input:checked+.slider:before {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 400px;
 }
 
+/* =========================================
+   7. RESERVATION CARDS & EXPANSION
+   ========================================= */
 .reservation-item {
     display: flex;
     flex-direction: column;
-    /* Contenedor que agrupa tarjeta y detalles */
     animation: fadeInUp 0.4s ease forwards;
     opacity: 0;
 }
@@ -867,17 +877,6 @@ input:checked+.slider:before {
 
 .reservation-card {
     background-color: #222222;
-    /* Slightly lighter than #121212 */
-    border-radius: 10px;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    transition: background 0.2s, transform 0.1s;
-    border: 1px solid transparent;
-}
-
-.reservation-card {
-    background-color: #222222;
     border-radius: 10px;
     padding: 12px 20px;
     display: flex;
@@ -886,18 +885,15 @@ input:checked+.slider:before {
     border: 1px solid transparent;
     position: relative;
     z-index: 2;
-    /* Para estar sobre el panel */
 }
 
-/* Estilo cuando está expandido */
+/* Expanded State */
 .reservation-card.expanded {
     background-color: var(--accent) !important;
     color: #121212 !important;
     border-radius: 10px 10px 0 0;
-    /* Solo esquinas superiores redondeadas */
 }
 
-/* Forzar color de texto negro en hijos cuando está expandido */
 .reservation-card.expanded .status,
 .reservation-card.expanded .btn-more {
     color: #121212 !important;
@@ -912,21 +908,28 @@ input:checked+.slider:before {
     border-color: #444;
 }
 
-/* Panel de Detalles Desplegable */
+/* --- Details Panel Animation (Grid Trick) --- */
 .details-panel {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.3s ease;
+    /* Smooth height transition */
+
     background-color: #1a1a1a;
-    /* Fondo más oscuro para el panel */
     border-radius: 0 0 10px 10px;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid transparent;
     margin-top: -5px;
-    /* Pequeño solapamiento visual */
     padding-top: 5px;
 }
 
 .details-panel.open {
     grid-template-rows: 1fr;
+    margin-bottom: 15px;
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    border-bottom: 1px solid #333;
 }
 
 .details-content {
@@ -934,6 +937,7 @@ input:checked+.slider:before {
     padding: 0 20px;
     opacity: 0;
     transition: opacity 0.3s ease, padding 0.3s ease;
+    min-height: 0;
 }
 
 .details-panel.open .details-content {
@@ -941,14 +945,11 @@ input:checked+.slider:before {
     opacity: 1;
 }
 
-/* Layout del contenido del panel */
-.details-grid {
+.details-grid-full {
     display: grid;
-    grid-template-columns: 1fr 1.5fr 0.8fr 1fr 1.2fr;
-    /* 5 Columnas */
-    gap: 15px;
-    color: #e5e5e5;
-    font-size: 0.9rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    color: #e0e0e0;
 }
 
 .center-content {
@@ -958,9 +959,28 @@ input:checked+.slider:before {
     align-items: center;
 }
 
+.detail-row {
+    margin-bottom: 6px;
+    line-height: 1.4;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.detail-row strong {
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.detail-row span {
+    width: 70%;
+    text-align: right;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
 .detail-column h4 {
     color: var(--accent);
-    /* Títulos en dorado por defecto, o blanco si prefieres */
     font-weight: 700;
     margin-bottom: 10px;
     font-size: 1rem;
@@ -977,7 +997,6 @@ input:checked+.slider:before {
     color: #fff;
 }
 
-/* Estilos específicos para montos */
 .amount-row {
     display: flex;
     justify-content: space-between;
@@ -1017,14 +1036,13 @@ input:checked+.slider:before {
     background-color: #059669;
 }
 
-/* Column Widths */
+/* Column Definitions */
 .col-nro {
     white-space: nowrap;
     width: 3%;
     text-align: center;
 }
 
-/* Status Badges */
 .status {
     font-weight: 600;
     font-size: 0.95rem;
@@ -1069,7 +1087,8 @@ input:checked+.slider:before {
     text-align: center;
 }
 
-.col-btn-cancel {
+.col-btn-print {
+    padding-left: 25px;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -1084,19 +1103,18 @@ input:checked+.slider:before {
 }
 
 .col-btn-more {
+    position: relative;
     width: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-
-
 /* Row Buttons */
-.btn-cancel {
+.btn-print {
     height: 30px;
-    background-color: #ef4444;
-    color: white;
+    background-color: #d4d4d4;
+    color: #121212;
     border: none;
     padding: 6px 14px;
     border-radius: 6px;
@@ -1125,14 +1143,13 @@ input:checked+.slider:before {
     color: #888;
     border: none;
     cursor: pointer;
-    padding: 0px 0px 0px 0px;
+    padding: 0;
     transition: color 0.3s;
     display: flex;
 }
 
-.btn-more svg {
-    width: 30px;
-    height: 30px;
+.btn-more i {
+    font-size: 1.2rem;
 }
 
 .btn-more:hover {
@@ -1143,104 +1160,86 @@ input:checked+.slider:before {
     background-color: var(--accent-hover);
 }
 
-.btn-cancel:hover {
-    background-color: var(--accent-hover-cancel);
+.btn-print:hover {
+    background-color: #a3a3a3;
 }
 
-/* --------------------------------------------------------------------------Pagination-------------------------------------------------------------------------- */
+/* =========================================
+   8. PAGINATION
+   ========================================= */
 .pagination {
-    margin-top: auto;
-    padding-top: 30px;
-    display: none;
-    /* Oculto por defecto - JS lo activará */
+    display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 0.85rem;
+    padding-top: 20px;
     color: #888;
+    font-size: 0.85rem;
+    width: 100%;
+    font-family: 'Work Sans', sans-serif;
+    user-select: none;
+    cursor: default;
+}
+
+.pager-btn {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.pager-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 .page-num.current {
     background-color: var(--accent);
     color: #121212;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-weight: 700;
-    padding-right: 2px;
-}
-
-
-.pagination-arrow {
-    color: var(--accent);
-    /* Naranja */
-    cursor: pointer;
-    font-size: 0.7rem;
-    /* Flechas pequeñas */
-    padding: 5px;
-    transition: transform 0.2s;
-    display: flex;
-    align-items: center;
-}
-
-.page-current {
-    background-color: var(--accent);
-    color: #121212;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    /* Círculo perfecto */
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    border-radius: 50%;
     font-weight: 700;
 }
 
-/* Custom Pagination Dropdown */
-.custom-pagination-dropdown {
-    position: relative;
-    margin-left: 2px;
-}
-
-.pagination-trigger {
+.page-select {
     display: flex;
     align-items: center;
     gap: 8px;
     color: #e5e5e5;
-    font-size: 0.9rem;
     cursor: pointer;
-    padding: 6px 12px;
-    border-bottom: 2px solid #888;
+    border-bottom: 2px solid #666;
+    padding: 2px 8px;
+    position: relative;
+    font-weight: 600;
     transition: border-color 0.3s;
-    min-width: 45px;
-    justify-content: center;
 }
 
-.pagination-trigger:hover {
+.page-select:hover,
+.page-select.active {
     border-color: var(--accent);
 }
 
-.pagination-trigger.open {
-    border-color: var(--accent);
-}
-
-.pagination-trigger i {
+.page-select i {
     font-size: 0.7rem;
     color: var(--accent);
     transition: transform 0.3s ease;
 }
 
-.pagination-trigger.open i {
+.page-select.active i {
     transform: rotate(180deg);
 }
 
 .pagination-menu {
     position: absolute;
     bottom: calc(100% + 10px);
-    /* Aparece ARRIBA del botón */
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     background-color: #222;
@@ -1249,12 +1248,21 @@ input:checked+.slider:before {
     list-style: none;
     padding: 8px 0;
     margin: 0;
-    min-width: 60px;
+    min-width: 50px;
+    max-height: 200px;
+    /* <--- Limita la altura */
+    overflow-y: auto;
+    /* <--- Scroll si es necesario */
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+}
+
+.pagination-menu::-webkit-scrollbar {
+    width: 0;
+    /* Ocultar barra para estética minimalista o ponerle 4px */
 }
 
 .pagination-menu.show {
@@ -1282,7 +1290,6 @@ input:checked+.slider:before {
     font-weight: 700;
 }
 
-/* Triángulo decorativo apuntando hacia abajo */
 .pagination-menu::after {
     content: '';
     position: absolute;
@@ -1294,18 +1301,18 @@ input:checked+.slider:before {
     border-color: #222 transparent transparent transparent;
 }
 
-/* -------------------------------------------------------------------------- Scrollbar Personalizada -------------------------------------------------------------------------- */
+/* =========================================
+   9. SCROLLBARS
+   ========================================= */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
-/* El "track" es el fondo. Ponerlo transparente elimina el blanco */
 ::-webkit-scrollbar-track {
     background: transparent;
 }
 
-/* El "thumb" es la parte que arrastras */
 ::-webkit-scrollbar-thumb {
     background-color: #444;
     border-radius: 4px;
@@ -1315,7 +1322,11 @@ input:checked+.slider:before {
     background-color: #666;
 }
 
-/* -------------------------------------------------------------------------- Menú Contextual (More Options) -------------------------------------------------------------------------- */
+/* =========================================
+   10. POPUPS, MENUS & OVERLAYS
+   ========================================= */
+
+/* --- Context Menu (More...) --- */
 .more-menu {
     position: absolute;
     background-color: #222;
@@ -1365,14 +1376,13 @@ input:checked+.slider:before {
     width: 16px;
 }
 
-/* Separador entre opciones */
 .more-menu-divider {
     height: 2px;
     background-color: #444;
-    margin: 0px 0;
+    margin: 0;
 }
 
-/* -------------------------------------------------------------------------- Modal de Confirmación -------------------------------------------------------------------------- */
+/* --- Confirmation Modal --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -1391,9 +1401,34 @@ input:checked+.slider:before {
     transition: all 0.3s ease;
 }
 
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+    }
+}
+
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .modal-overlay.show {
     opacity: 1;
     visibility: visible;
+    animation: modalFadeIn 0.2s ease-out forwards;
 }
 
 .modal-overlay.hidden {
@@ -1404,7 +1439,7 @@ input:checked+.slider:before {
     background-color: #222;
     border: 2px solid #444;
     border-radius: 16px;
-    padding: 40px 50px;
+    padding: 20px 40px 40px 40px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     transform: scale(0.9);
     transition: transform 0.3s ease;
@@ -1414,6 +1449,7 @@ input:checked+.slider:before {
 
 .modal-overlay.show .modal-box {
     transform: scale(1);
+    animation: modalScaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .modal-message {
@@ -1462,13 +1498,12 @@ input:checked+.slider:before {
     transform: scale(0.98);
 }
 
-/* Aplicar blur al contenido cuando el modal está activo */
 .app-container.modal-active {
     filter: blur(4px);
     pointer-events: none;
 }
 
-/* -------------------------------------------------------------------------- Modal de Éxito -------------------------------------------------------------------------- */
+/* --- Success Modal --- */
 .success-box {
     display: flex;
     flex-direction: column;
@@ -1476,7 +1511,6 @@ input:checked+.slider:before {
     justify-content: center;
     padding: 40px 60px;
     max-width: 400px;
-    /* Estado inicial para transición suave */
     transform: scale(0.8);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1486,8 +1520,6 @@ input:checked+.slider:before {
     transform: scale(1);
     opacity: 1;
 }
-
-
 
 .success-title {
     color: #fff;
@@ -1516,6 +1548,9 @@ input:checked+.slider:before {
     }
 }
 
+/* =========================================
+   11. FILTER BAR PATCHES (OVERRIDES)
+   ========================================= */
 
 .btn-search {
     appearance: none;
@@ -1529,7 +1564,7 @@ input:checked+.slider:before {
     display: none !important;
 }
 
-/* 3. Corregir icono lupa - usando search-wrapper */
+/* Fix Search Lens Icon */
 .search-wrapper {
     position: relative;
 }
@@ -1549,9 +1584,7 @@ input:checked+.slider:before {
     padding-left: 45px !important;
 }
 
-
-
-/* Fix adicional para eliminar CUALQUIER flecha del botón buscar */
+/* Force standard button appearance */
 .btn-search,
 .btn-search * {
     background-image: none !important;
@@ -1566,7 +1599,7 @@ input:checked+.slider:before {
     border: none !important;
 }
 
-/* Asegurar que no herede estilos de select */
+/* Specific styling for Filter Actions context */
 .filter-actions .btn-search {
     all: unset;
     background-color: var(--accent) !important;
@@ -1586,16 +1619,12 @@ input:checked+.slider:before {
     background-color: var(--accent-hover) !important;
 }
 
-
-/* Corrección crítica de posicionamiento para grupos de filtros */
+/* Ensure relative positioning for filter groups */
 .filter-group {
     position: relative !important;
-    /* Esto asegura que los iconos absolutos (como el chevron del select) 
-       se queden DENTRO de su grupo y no vuelen al botón buscar */
 }
 
-
-/* Eliminar flecha nativa blanca del selector de estado */
+/* Hide browser default arrows */
 .filter-select {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1603,18 +1632,19 @@ input:checked+.slider:before {
     background-image: none !important;
 }
 
-/* Fix para IE/Edge (por seguridad) */
 .filter-select::-ms-expand {
     display: none;
 }
 
-/* --- REFACTORIZACIÓN: ESTILOS MOVIDOS DE INLINE A CSS --- */
+/* =========================================
+   12. REFACTORING & MODERN UPDATES
+   (These override previous styles)
+   ========================================= */
 
-/* Layout.jsx */
+/* Layout Updates */
 .app-container {
     display: flex;
     height: 100vh;
-    overflow: hidden;
     width: 100%;
 }
 
@@ -1622,23 +1652,22 @@ input:checked+.slider:before {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
 .content-area {
+    padding: 0px 0px 10px 0px;
     flex: 1;
     overflow-y: auto;
-    /* Por defecto con scroll */
     display: flex;
     flex-direction: column;
 }
 
 .content-area.no-scroll {
     overflow-y: hidden !important;
-    /* Home sin scroll */
+    /* Locks home */
 }
 
-/* Sidebar.jsx */
+/* Sidebar Profile Updates */
 .profile-icon-container {
     margin-bottom: 40px;
 }
@@ -1655,6 +1684,7 @@ input:checked+.slider:before {
     position: relative;
 }
 
+/* Sliding Indicator Logic */
 .nav-indicator-sliding {
     position: absolute;
     right: -28px;
@@ -1664,38 +1694,73 @@ input:checked+.slider:before {
     border-radius: 4px 0 0 4px;
     pointer-events: none;
     transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-    /* top, height, opacity controlados por JS inline */
 }
 
-/* ReservationCard.jsx */
-.col-btn-more {
-    position: relative;
-}
-
+/* --- Menu "More" Refinements (Min-Width Fix) --- */
 .more-menu {
-    /* Base styles */
-    position: absolute;
-    top: 100%;
-    right: 0;
-    z-index: 100;
-    display: none;
-    /* Oculto por defecto */
+    z-index: 1000;
+    background-color: #222;
+    border: 2px solid #444;
+    border-radius: 8px 0px 8px 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    padding: 0;
+    min-width: 130px;
+    /* Force consistent width */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .more-menu.show {
+    animation: fadeInMenu 0.1s ease-out;
+}
+
+.more-menu-option {
+    padding: 14px 20px;
     display: flex;
-    /* O block, dependiendo del diseño original */
+    align-items: center;
+    gap: 10px;
+    color: #e5e5e5;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+}
+
+.more-menu-option:hover {
+    background-color: #333;
+    color: var(--accent);
+}
+
+.more-menu-option i {
+    width: 16px;
+    text-align: center;
+}
+
+.more-menu-divider {
+    height: 1px;
+    background-color: #444;
+    margin: 0;
+}
+
+@keyframes fadeInMenu {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .mt-20 {
     margin-top: 20px;
 }
 
-
-/* --- ESTILOS DEL FORMULARIO DE NUEVA RESERVA --- */
+/* --- RESERVATION FORM UPDATES --- */
 .form-card {
     background-color: var(--sidebar-bg);
-    /* O #222 si la variable no existe */
     border-radius: 16px;
     padding: 30px;
     flex: 1;
@@ -1766,10 +1831,9 @@ input:checked+.slider:before {
 
 .input-wrapper:focus-within {
     border-color: #f3da66;
-    /* accent */
 }
 
-/* Switch Toggle */
+/* Updated Toggles */
 .switch {
     position: relative;
     display: inline-block;
@@ -1815,7 +1879,7 @@ input:checked+.slider:before {
     transform: translateX(24px);
 }
 
-/* Stepper */
+/* Updated Stepper */
 .service-controls {
     display: flex;
     gap: 20px;
@@ -1875,4 +1939,96 @@ input:checked+.slider:before {
     display: flex;
     justify-content: center;
     margin-top: 40px;
+}
+
+/* Updated Responsive */
+@media (max-width: 900px) {
+    .details-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 550px) {
+    .details-grid-full {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Detail Styling */
+.detail-section {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 141, 40, 0.1);
+}
+
+.detail-title {
+    color: #FF8D28;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 141, 40, 0.2);
+    padding-bottom: 5px;
+}
+
+.detail-title i {
+    margin-right: 6px;
+}
+
+.detail-row {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.detail-row strong {
+    color: #8B8989;
+    font-weight: 500;
+}
+
+.detail-row span {
+    color: #fff;
+    font-weight: 400;
+    text-align: right;
+}
+
+/* Status Colors */
+.text-danger {
+    color: #ff4d4d !important;
+    font-weight: bold !important;
+}
+
+.text-success {
+    color: #00e676 !important;
+    font-weight: bold !important;
+}
+
+/* Pay Button */
+.btn-pay {
+    width: 100%;
+    background-color: rgba(0, 230, 118, 0.1);
+    color: #00e676;
+    border: 1px solid #00e676;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.btn-pay:hover {
+    background-color: #00e676;
+    color: #000;
+}
+
+.mt-10 {
+    margin-top: 10px;
 }
