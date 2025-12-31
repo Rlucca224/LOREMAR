@@ -1,4 +1,3 @@
-/* prismaClient.js */
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { Pool } = require('pg');
@@ -6,13 +5,18 @@ require('dotenv').config();
 
 const connectionString = process.env.DATABASE_URL;
 
-// 1. Crear Pool de PG
+// Validación: Verificar que DATABASE_URL existe
+if (!connectionString) {
+    throw new Error('❌ DATABASE_URL no está definida en el archivo .env');
+}
+
 const pool = new Pool({ connectionString });
-
-// 2. Crear Adaptador
 const adapter = new PrismaPg(pool);
-
-// 3. Crear Cliente con el Adaptador
 const prisma = new PrismaClient({ adapter });
+
+// Manejo de errores del pool para evitar crashes inesperados
+pool.on('error', (err) => {
+    console.error('❌ Error inesperado en el pool de conexiones:', err);
+});
 
 module.exports = prisma;

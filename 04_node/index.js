@@ -1,9 +1,11 @@
 /* index.js */
 const express = require('express');
 const cors = require('cors');
+const serverless = require('serverless-http');
 require('dotenv').config();
 
-const reservationsRoutes = require('./routes/reservations'); // <--- Importamos rutas
+// Rutas
+const reservationsRoutes = require('./routes/reservations');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -12,15 +14,24 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// Rutas
-app.use('/api/reservations', reservationsRoutes); // <--- Conectamos la ruta
+// Diagnóstico de modo
+console.log("Modo de ejecución:", process.env.AWS_EXECUTION_ENV ? "AWS LAMBDA" : "LOCAL (PC)");
 
-// Ruta de prueba
+// Asignar Rutas
+app.use('/api/reservations', reservationsRoutes);
+
+// Ruta Base
 app.get('/', (req, res) => {
     res.send('Backend de LOREMAR funcionando correctamente 🚀');
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+// Configuración de arranque
+if (process.env.AWS_EXECUTION_ENV) {
+    module.exports.handler = serverless(app);
+} else {
+    // Modo Local
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+        console.log("Presiona CTRL+C para detenerlo.");
+    });
+}

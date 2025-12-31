@@ -1,0 +1,22 @@
+service: loremar-backend
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1 # São Paulo (Donde está tu base de datos)
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+
+functions:
+  api:
+    handler: index.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+
+plugins:
+  - serverless-offline # Opcional: para probar modo serverless en local si quisieras

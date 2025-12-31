@@ -8,6 +8,21 @@ datasource db {
   provider = "postgresql"
 }
 
+// ==========================================
+// MODELO DE USUARIOS (AUTENTICACIÓN)
+// ==========================================
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String // Hash bcrypt
+  role      String   @default("employee") // admin | employee
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// MODELO DE RESERVAS
+// ==========================================
 model Reservation {
   id        Int      @id @default(autoincrement()) // nroCliente/Reserva
   createdAt DateTime @default(now())
@@ -19,9 +34,9 @@ model Reservation {
   clientPhone String?
 
   // 2. Detalles del Evento
-  eventType   String?  // Ej: Cumpleaños, Casamiento
+  eventType   String? // Ej: Cumpleaños, Casamiento
   eventDate   DateTime
-  description String?  // Detalles adicionales
+  description String? // Detalles adicionales
 
   // 3. Servicios Adicionales (Aire Acondicionado)
   hasAc          Boolean @default(false)
@@ -30,9 +45,9 @@ model Reservation {
   acTotal        Float   @default(0) // acHours * acPricePerHour
 
   // 4. Montos y Pagos
-  rentalPrice  Float   @default(0) // Precio base del alquiler
-  deposit      Float   @default(0) // Seña recibida
-  balance      Float   @default(0) // Saldo pendiente (Calculado: Alquiler + AC - Seña)
-  
-  status       String  @default("Pendiente") // Pendiente | Pagado | Cancelado
+  rentalPrice Float @default(0) // Precio base del alquiler
+  deposit     Float @default(0) // Seña recibida
+  balance     Float @default(0) // Saldo pendiente (Calculado: Alquiler + AC - Seña)
+
+  status String @default("Pendiente") // Pendiente | Pagado | Cancelado
 }

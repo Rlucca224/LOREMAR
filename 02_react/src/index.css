@@ -251,7 +251,6 @@ body {
 }
 
 .form-section {
-    margin-bottom: 60px;
     cursor: default;
 }
 
@@ -1773,7 +1772,7 @@ input:checked+.slider:before {
 }
 
 .form-section {
-    margin-bottom: 60px;
+    margin-bottom: 50px;
 }
 
 .section-title {
@@ -1938,7 +1937,6 @@ input:checked+.slider:before {
 .form-footer {
     display: flex;
     justify-content: center;
-    margin-top: 40px;
 }
 
 /* Updated Responsive */
@@ -2031,4 +2029,264 @@ input:checked+.slider:before {
 
 .mt-10 {
     margin-top: 10px;
+}
+
+/* Skeleton Loading Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    background: #2a2a2a;
+    background-image: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+}
+
+.skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.skeleton-title {
+    height: 20px;
+    width: 60%;
+    margin-bottom: 12px;
+}
+
+.skeleton-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Skeleton Minimalista (Barra con brillo) */
+.skeleton-bar {
+    width: 100%;
+    height: 60px;
+    background: #2a2a2a;
+    /* Gradiente suave */
+    background-image: linear-gradient(90deg,
+            #2a2a2a 0%,
+            #3d3d3d 50%,
+            #2a2a2a 100%);
+    background-size: 200% 100%;
+    background-repeat: repeat-x;
+    /* IMPORTANTE: Evita que el brillo salga repetido */
+    border-radius: 10px;
+    animation: shimmer 3s infinite linear;
+    /* Constante y lento */
+}
+
+/* Animaciones de Entrada y Salida para Skeletons */
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.fade-out {
+    animation: fadeOut 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* =========================================
+   13. LOGIN PAGE STYLES
+   ========================================= */
+
+.login-container {
+    background-color: #0a0a0a;
+    min-height: 100vh;
+    /* Vuelve a ocupar toda la pantalla */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.login-header {
+    position: absolute;
+    top: 60px;
+    /* Ajusta este valor para subirlo más o menos */
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    z-index: 10;
+}
+
+.brand-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.text-gold {
+    background: linear-gradient(to right, #faf17b 20%, #d4934c 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: #e6c880;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.login-card {
+    background-color: #111111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    /* Necesario para z-index */
+    z-index: 10;
+    /* Encima del fondo 3D */
+}
+
+.login-card h2 {
+    color: #e5e5e5;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.login-input-group {
+    margin-bottom: 20px;
+}
+
+.login-input-group label {
+    display: block;
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.login-input-wrapper {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0 15px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.login-input-wrapper:focus-within,
+.login-input-wrapper.active-border {
+    border-color: #f3da66;
+}
+
+.login-input-wrapper input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    flex: 1;
+    height: 100%;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+.toggle-password {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password:hover {
+    color: #999;
+}
+
+.btn-login {
+    width: 100%;
+    background-color: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+    background-color: var(--accent-hover);
+}
+
+.login-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.link-btn:hover {
+    color: #999;
+}
+
+.separator {
+    /* Opcional: si quieres un punto separador */
+    /* width: 3px; height: 3px; background: #444; border-radius: 50%; */
+}
+
+.login-footer {
+    position: absolute;
+    bottom: 30px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 400;
 }

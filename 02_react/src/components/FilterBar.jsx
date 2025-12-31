@@ -85,6 +85,7 @@ const FilterBar = ({ isOpen, onSearch }) => {
                                 const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
                                 setName(val);
                             }}
+                            autoComplete="off"
                         />
                     </div>
 
@@ -101,6 +102,7 @@ const FilterBar = ({ isOpen, onSearch }) => {
                                     const val = e.target.value.replace(/[^0-9]/g, '');
                                     setClientId(val);
                                 }}
+                                autoComplete="off"
                             />
                         </div>
                     </div>

@@ -1,3 +1,6 @@
+// Load environment variables manually to ensure they are available
+require('dotenv').config();
+
 const { defineConfig } = require('@prisma/config');
 
 module.exports = defineConfig({
@@ -6,8 +9,8 @@ module.exports = defineConfig({
         path: 'prisma/migrations',
     },
     datasource: {
-        // Hardcoded URL for debugging connection issues using 127.0.0.1
-        url: "postgresql://postgres:conera332@127.0.0.1:5432/loremar_db?schema=public",
+        // Use environment variable for database connection (Cloud-ready!)
+        url: process.env.DATABASE_URL,
         provider: 'postgresql',
     },
 });

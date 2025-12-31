@@ -110,7 +110,7 @@ const NewReservation = () => {
 
         try {
             console.log("Enviando reserva:", payload);
-            const response = await fetch('http://192.168.1.3:4000/api/reservations', {
+            const response = await fetch('http://localhost:4000/api/reservations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

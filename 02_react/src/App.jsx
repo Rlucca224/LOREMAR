@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import Layout from './components/Layout';
 import ReservationList from './components/ReservationList';
 import NewReservation from './components/NewReservation';
+import Login from './components/Login';
 
 // Componente Placeholder para el Home (Dashboard)
 const Home = () => {
@@ -33,6 +34,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="reservas" element={<ReservationList />} />
