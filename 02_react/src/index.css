@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    LOREMAR EVENTOS - MAIN STYLESHEET
    ========================================================================== */
 
@@ -1261,7 +1261,7 @@ input:checked+.slider:before {
 
 .pagination-menu::-webkit-scrollbar {
     width: 0;
-    /* Ocultar barra para estética minimalista o ponerle 4px */
+    /* Ocultar barra para est�tica minimalista o ponerle 4px */
 }
 
 .pagination-menu.show {
@@ -2136,7 +2136,7 @@ input:checked+.slider:before {
 .login-header {
     position: absolute;
     top: 60px;
-    /* Ajusta este valor para subirlo más o menos */
+    /* Ajusta este valor para subirlo m�s o menos */
     width: 100%;
     text-align: center;
     margin: 0;
@@ -2170,7 +2170,6 @@ input:checked+.slider:before {
     padding: 40px;
     width: 100%;
     max-width: 400px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     position: relative;
     /* Necesario para z-index */
     z-index: 10;
@@ -2289,4 +2288,148 @@ input:checked+.slider:before {
     color: #fff;
     font-size: 1.1rem;
     font-weight: 400;
+}
+
+/* ========================================
+   BOTON DE CERRAR SESION
+   ======================================== */
+.logout-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.logout-btn i {
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+    transform: scaleX(-1);
+    /* Voltear horizontalmente */
+}
+
+.logout-btn:hover i {
+    color: var(--text-primary);
+}
+
+/* ========================================
+   LOADING SPINNER
+   ======================================== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: slideUp 0.4s ease-out;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(176, 176, 176, 0.2);
+    border-top: 4px solid #b0b0b0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    color: #b0b0b0;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   BOTON SUBMIT (Generico)
+   ======================================== */
+.btn-submit {
+    width: 100%;
+    background-color: var(--accent);
+    color: #000;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    /* Flexbox para centrar contenido */
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    /* Alto fijo importante para evitar deformaciones */
+    transition: background-color 0.2s;
+    overflow: hidden;
+    /* Asegura que la animación no se salga */
+}
+
+.btn-submit:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-submit:disabled {
+    opacity: 0.9;
+    cursor: not-allowed;
+    background-color: var(--accent);
+}
+
+/* Contenedor para el Lottie dentro del botón */
+.spinner-lottie {
+    width: 120px;
+    height: 100px;
+    /* Altura forzada */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    /* Asegura que no interfiera con clicks */
 }

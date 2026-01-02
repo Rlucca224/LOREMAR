@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import ReservationList from './components/ReservationList';
 import NewReservation from './components/NewReservation';
 import Login from './components/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Componente Placeholder para el Home (Dashboard)
 const Home = () => {
@@ -34,8 +35,18 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Ruta pública: Login */}
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Layout />}>
+
+        {/* Rutas protegidas: Requieren autenticación */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Home />} />
           <Route path="reservas" element={<ReservationList />} />
           <Route path="nueva-reserva" element={<NewReservation />} />

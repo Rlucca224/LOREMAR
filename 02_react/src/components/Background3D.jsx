@@ -13,7 +13,7 @@ const Background3D = () => {
 
         // 1. Configuración de Escena
         const BACKGROUND_COLOR = 0x0a0a0a; // Color negro (se mezcla con el CSS si es opaco)
-        const PARTICLE_COLOR = 0xffda7c;   // Dorado LOREMAR
+        const PARTICLE_COLOR = 0xfaf17b;   // Dorado LOREMAR
 
         const scene = new THREE.Scene();
         // scene.background = new THREE.Color(BACKGROUND_COLOR); // Comentado para permitir transparencia
@@ -66,15 +66,19 @@ const Background3D = () => {
                 uMouseVel: { value: new THREE.Vector2(0, 0) },
                 uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
                 uPixelRatio: { value: renderer.getPixelRatio() },
-                uColor: { value: new THREE.Color(PARTICLE_COLOR) }
+                uColor1: { value: new THREE.Color(PARTICLE_COLOR) }, // Dorado
+                uColor2: { value: new THREE.Color(0xf9ac58) }        // Naranja Cobrizo (Segundo color)
             },
             vertexShader: `
                 uniform float uTime;
                 uniform vec2 uMouse;
                 uniform float uPixelRatio;
                 uniform vec2 uMouseVel;
+                uniform vec3 uColor1;
+                uniform vec3 uColor2;
         
                 varying float vAlpha;
+                varying vec3 vColor; // Color calculado para este punto
         
                 // --- Simplex Noise 2D ---
                 vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -153,7 +157,20 @@ const Background3D = () => {
                     vec2 displacement = uMouseVel * ringInfluence * 3.0; 
                     pos.xy += displacement;
                     
-                    // --- 3. CÁLCULO FINAL DE TAMAÑO ---
+                    // --- 3. COLOR DINÁMICO (NUBES) ---
+                    float colorNoiseScale = 0.005; // Escala grande para "nubes"
+                    float colorSpeed = 0.1;
+                    
+                    // Generar un valor de ruido entre 0 y 1
+                    float colorN = snoise(vec2(position.x * colorNoiseScale + uTime * colorSpeed, position.y * colorNoiseScale - uTime * colorSpeed * 0.5));
+                    
+                    // Normalizar ruido de [-1, 1] a [0, 1]
+                    float mixFactor = (colorN + 1.0) * 0.5;
+                    
+                    // Mezclar los dos colores
+                    vColor = mix(uColor1, uColor2, mixFactor);
+
+                    // --- 4. CÁLCULO FINAL DE TAMAÑO ---
                     float baseSize = 0.15; // Tamaño mínimo
                     float finalSize = baseSize + (ringInfluence * 7.0) + (ambientScale * 0.5);
         
@@ -171,7 +188,7 @@ const Background3D = () => {
                 }
             `,
             fragmentShader: `
-                uniform vec3 uColor;
+                varying vec3 vColor;
                 varying float vAlpha;
         
                 void main() {
@@ -184,7 +201,7 @@ const Background3D = () => {
                     float delta = fwidth(r);
                     float alpha = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);
         
-                    gl_FragColor = vec4(uColor, vAlpha * alpha);
+                    gl_FragColor = vec4(vColor, vAlpha * alpha);
                 }
             `,
             transparent: true,
@@ -224,7 +241,8 @@ const Background3D = () => {
         const animate = () => {
             animationIdRef.current = requestAnimationFrame(animate);
 
-            const time = clock.getElapsedTime();
+            // Multiplicamos por 0.3 para reducir la velocidad de fluctuación
+            const time = clock.getElapsedTime() * 0.5;
             shaderMaterial.uniforms.uTime.value = time;
 
             // 1. Calcular Target

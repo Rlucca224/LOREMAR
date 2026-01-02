@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import profileIcon from '../assets/no_icon_profile.svg';
 
 const Sidebar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const navRef = useRef(null);
     const indicatorRef = useRef(null);
 
@@ -36,6 +37,29 @@ const Sidebar = () => {
         };
     }, [location.pathname]);
 
+    const handleLogout = async () => {
+        try {
+            // Llamar al backend para limpiar las cookies
+            await fetch('http://localhost:4000/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include' // Enviar cookies
+            });
+
+            // Limpiar localStorage
+            localStorage.removeItem('user');
+
+            console.log('🚪 Sesión cerrada');
+
+            // Redirigir al login
+            navigate('/login');
+        } catch (error) {
+            console.error('❌ Error al cerrar sesión:', error);
+            // Redirigir de todas formas
+            localStorage.removeItem('user');
+            navigate('/login');
+        }
+    };
+
     return (
         <aside className="sidebar left-sidebar">
             <div className="profile-icon-container">
@@ -63,6 +87,11 @@ const Sidebar = () => {
             </nav>
 
             <div className="settings">
+                {/* Botón de Cerrar Sesión */}
+                <button onClick={handleLogout} className="nav-item logout-btn" title="Cerrar Sesión">
+                    <i className="fa-solid fa-right-from-bracket"></i>
+                </button>
+
                 <a href="#" className="nav-item" title="Configuración">
                     <i className="fa-solid fa-gear"></i>
                 </a>

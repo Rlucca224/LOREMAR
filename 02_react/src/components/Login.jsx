@@ -1,21 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Background3D from './Background3D';
+import LoadingSpinner from './LoadingSpinner';
 
 const Login = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [checking, setChecking] = useState(true); // Verificando sesión
 
-    const handleSubmit = (e) => {
+    // Verificar si ya hay sesión activa (como Gmail, GitHub, etc.)
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/api/auth/verify', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    console.log('✅ Ya hay sesión activa, redirigiendo al dashboard...');
+                    navigate('/', { replace: true });
+                } else {
+                    // No hay sesión, mostrar login
+                    setChecking(false);
+                }
+            } catch (error) {
+                // No hay sesión, mostrar login
+                setChecking(false);
+            }
+        };
+
+        checkSession();
+    }, [navigate]);
+
+    // Mostrar spinner mientras verifica la sesión
+    if (checking) {
+        return <LoadingSpinner />;
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Lógica temporal para probar VISUALMENTE
-        console.log("Login attempt (Simulado):", { username, password });
+        setError(''); // Limpiar errores previos
+        setLoading(true);
 
-        // Simulación de éxito (opcional, para que veas q redirige)
-        // navigate('/'); 
+        try {
+            console.log('🔐 Intentando login...');
+
+            const response = await fetch('http://localhost:4000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // IMPORTANTE: Enviar y recibir cookies
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Error de autenticación
+                setError(data.error || 'Usuario o contraseña incorrectos');
+                setLoading(false);
+                return;
+            }
+
+            // Login exitoso
+            console.log('✅ Login exitoso:', data);
+
+            // Guardar solo info del usuario en localStorage (NO el token)
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Redirigir al dashboard
+            navigate('/');
+
+        } catch (error) {
+            console.error('❌ Error en login:', error);
+            setError('Error de conexión con el servidor');
+            setLoading(false);
+        }
     };
 
     return (
@@ -71,14 +138,33 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn-login">
-                        Ingresar
+                    {/* Mensaje de error */}
+                    {error && (
+                        <div style={{
+                            margin: '15px 30px 20px',
+                            padding: '8px 8px 8px 8px',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            borderRadius: '8px',
+                            color: '#ef4444',
+                            fontSize: '0.9rem',
+                            textAlign: 'center'
+                        }}>
+                            <i className="fa-solid fa-circle-exclamation" style={{ marginRight: '8px' }}></i>
+                            {error}
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="btn-login"
+                        disabled={loading}
+                    >
+                        {loading ? 'Ingresando...' : 'Ingresar'}
                     </button>
 
                     <div className="login-links">
-                        <button type="button" className="link-btn">Olvide La Contraseña</button>
-                        <span className="separator"></span>
-                        <button type="button" className="link-btn">Soporte</button>
+                        <button type="button" className="link-btn">Olvide la contraseña</button>
                     </div>
                 </form>
             </div>
